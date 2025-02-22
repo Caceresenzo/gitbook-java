@@ -30,6 +30,8 @@ public class FeignGitBookErrorDecoder extends ErrorDecoder.Default {
 			this.mappers.add(ErrorMapper.startsWithAndEndswith("User ", " not found", GitBookClientException.UserNotFound::new));
 
 			this.mappers.add(ErrorMapper.equals("No matching organization found", GitBookClientException.OrganizationNotFound::new));
+
+			this.mappers.add(ErrorMapper.startsWith("No matching space found", GitBookClientException.SpaceNotFound::new));
 		}
 	}
 

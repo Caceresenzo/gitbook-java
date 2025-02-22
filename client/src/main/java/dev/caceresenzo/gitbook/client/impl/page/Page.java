@@ -1,22 +1,26 @@
 package dev.caceresenzo.gitbook.client.impl.page;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public record Page<T>(
-	List<T> items
+	List<T> items,
+	Next next
 ) {
 
 	public boolean isEmpty() {
 		return items == null || items.isEmpty();
 	}
 
-	public Stream<T> stream() {
-		if (isEmpty()) {
-			return Stream.empty();
+	public String nextCursor() {
+		if (next == null) {
+			return null;
 		}
 
-		return items.stream();
+		return next.page();
 	}
+
+	public record Next(
+		String page
+	) {}
 
 }

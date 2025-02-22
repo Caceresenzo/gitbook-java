@@ -7,9 +7,17 @@ This Java client connects with GitBook.com, enabling simple interaction with the
 - [Client](#client)
   - [Configuration](#configuration)
   - [Usage](#usage)
-    - [API Info](#api-info)
-    - [Find the Currently Authenticated User](#find-the-currently-authenticated-user)
-    - [Find a User by an ID](#find-a-user-by-an-id)
+    - [API](#api)
+      - [Get API Informations](#get-api-informations)
+    - [User](#user)
+      - [Find the Currently Authenticated User](#find-the-currently-authenticated-user)
+      - [Find a User by an ID](#find-a-user-by-an-id)
+    - [Organization](#organization)
+      - [Stream Organizations](#stream-organizations)
+      - [Find an Organization by an ID](#find-an-organization-by-an-id)
+    - [Space](#space)
+      - [Stream Spaces](#stream-spaces)
+      - [Find a Space by an ID](#find-a-space-by-an-id)
 - [Spring Boot Starter](#spring-boot-starter)
   - [Client](#client-1)
 
@@ -46,13 +54,17 @@ GitBookClient client = GitBookClient.builder()
 
 ## Usage
 
-### API Info
+### API
+
+#### Get API Informations
 
 ```java
 ApiInfo info = client.getApiInfo();
 ```
 
-### Find the Currently Authenticated User
+### User
+
+#### Find the Currently Authenticated User
 
 The user will not be found if the access token is missing or invalid.
 
@@ -60,10 +72,45 @@ The user will not be found if the access token is missing or invalid.
 Optional<User> user = client.findCurrentUser();
 ```
 
-### Find a User by an ID
+#### Find a User by an ID
 
 ```java
 Optional<User> user = client.findUserById("a0b1c2d3e4f5g6h7i8j9k0l1m2n3");
+```
+
+### Organization
+
+#### Stream Organizations
+
+```java
+Stream<Organization> organizations = client.findAllOrganizations();
+
+/* or get a list via */
+List<Organization> organizations = client.findAllOrganizations().toList();
+```
+
+#### Find an Organization by an ID
+
+```java
+Optional<Organization> organization = client.findOrganization("a0b1c2d3e4f5g6h7i8j9k0l1m2n3");
+```
+
+### Space
+
+#### Stream Spaces
+
+```java
+String organizationId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Stream<Space> spaces = client.findAllSpaces(organizationId);
+
+/* or get a list via */
+List<Space> spaces = client.findAllSpaces(organizationId).toList();
+```
+
+#### Find a Space by an ID
+
+```java
+Optional<Space> space = client.findSpace("a0b1c2d3e4f5g6h7i8j9k0l1m2n3");
 ```
 
 # Spring Boot Starter
