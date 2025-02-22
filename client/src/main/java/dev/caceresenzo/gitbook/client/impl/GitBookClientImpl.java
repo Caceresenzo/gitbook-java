@@ -2,11 +2,13 @@ package dev.caceresenzo.gitbook.client.impl;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import dev.caceresenzo.gitbook.client.GitBookClient;
 import dev.caceresenzo.gitbook.client.GitBookClientException;
 import dev.caceresenzo.gitbook.client.impl.auth.AuthRequestInterceptor;
 import dev.caceresenzo.gitbook.model.ApiInfo;
+import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.User;
 import dev.caceresenzo.gitbook.util.GitBookUtils;
 import feign.Feign;
@@ -52,16 +54,26 @@ public class GitBookClientImpl implements GitBookClient {
 	}
 
 	@Override
-	public Optional<User> findUserById(String id) {
-		if (id == null) {
+	public Optional<User> findUserById(String userId) {
+		if (userId == null) {
 			return Optional.empty();
 		}
 
 		try {
-			return Optional.of(delegate.getUserById(id));
+			return Optional.of(delegate.getUserById(userId));
 		} catch (GitBookClientException.UserNotFound __) {
 			return Optional.empty();
 		}
+	}
+	
+	@Override
+	public Stream<Organization> findAllOrganizations() {
+		return delegate.getOrganizations().stream();
+	}
+	
+	@Override
+	public Optional<Organization> findOrganizationById(String organizationId) {
+		return Optional.of(delegate.getOrganizationById(organizationId));
 	}
 
 }

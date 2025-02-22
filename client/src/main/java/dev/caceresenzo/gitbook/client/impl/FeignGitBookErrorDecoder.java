@@ -28,6 +28,8 @@ public class FeignGitBookErrorDecoder extends ErrorDecoder.Default {
 			this.mappers.add(ErrorMapper.equals("Invalid authentication token", GitBookClientException.InvalidAuthenticationToken::new));
 
 			this.mappers.add(ErrorMapper.startsWithAndEndswith("User ", " not found", GitBookClientException.UserNotFound::new));
+
+			this.mappers.add(ErrorMapper.equals("No matching organization found", GitBookClientException.OrganizationNotFound::new));
 		}
 	}
 

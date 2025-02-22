@@ -16,4 +16,7 @@ public class GitBookClientException extends GitBookException {
 	@StandardException
 	public static class UserNotFound extends GitBookClientException {}
 
+	@StandardException
+	public static class OrganizationNotFound extends GitBookClientException {}
+
 }
