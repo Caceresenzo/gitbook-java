@@ -13,5 +13,6 @@ public class GitBookProperties {
 
 	private String apiUrl;
 	private String accessToken;
+	private Long maxPageSize;
 
 }

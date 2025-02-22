@@ -38,6 +38,11 @@ public class GitBookAutoConfiguration {
 			log.info("No Access Token specified, using unauthenticated mode");
 		}
 
+		final var maxPageSize = properties.getMaxPageSize();
+		if (maxPageSize != null) {
+			builder.maxPageSize(maxPageSize);
+		}
+
 		return builder.build();
 	}
 
