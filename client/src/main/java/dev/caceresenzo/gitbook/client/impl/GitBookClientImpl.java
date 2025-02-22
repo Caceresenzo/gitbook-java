@@ -1,10 +1,13 @@
 package dev.caceresenzo.gitbook.client.impl;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import dev.caceresenzo.gitbook.client.GitBookClient;
+import dev.caceresenzo.gitbook.client.GitBookClientException;
 import dev.caceresenzo.gitbook.client.impl.auth.AuthRequestInterceptor;
 import dev.caceresenzo.gitbook.model.ApiInfo;
+import dev.caceresenzo.gitbook.model.User;
 import dev.caceresenzo.gitbook.util.GitBookUtils;
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
@@ -24,7 +27,8 @@ public class GitBookClientImpl implements GitBookClient {
 
 		final var feignBuilder = Feign.builder()
 			.encoder(new JacksonEncoder(mapper))
-			.decoder(new JacksonDecoder(mapper));
+			.decoder(new JacksonDecoder(mapper))
+			.errorDecoder(new FeignGitBookErrorDecoder(mapper));
 
 		if (accessToken != null) {
 			feignBuilder.requestInterceptor(new AuthRequestInterceptor(accessToken));
@@ -36,6 +40,28 @@ public class GitBookClientImpl implements GitBookClient {
 	@Override
 	public ApiInfo getApiInfo() {
 		return delegate.getApiInfo();
+	}
+
+	@Override
+	public Optional<User> findCurrentUser() {
+		try {
+			return Optional.of(delegate.getAuthenticatedUser());
+		} catch (GitBookClientException.AuthenticationRequired | GitBookClientException.InvalidAuthenticationToken __) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<User> findUserById(String id) {
+		if (id == null) {
+			return Optional.empty();
+		}
+
+		try {
+			return Optional.of(delegate.getUserById(id));
+		} catch (GitBookClientException.UserNotFound __) {
+			return Optional.empty();
+		}
 	}
 
 }

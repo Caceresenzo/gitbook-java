@@ -8,6 +8,8 @@ This Java client connects with GitBook.com, enabling simple interaction with the
   - [Configuration](#configuration)
   - [Usage](#usage)
     - [API Info](#api-info)
+    - [Find the Currently Authenticated User](#find-the-currently-authenticated-user)
+    - [Find a User by an ID](#find-a-user-by-an-id)
 - [Spring Boot Starter](#spring-boot-starter)
   - [Client](#client-1)
 
@@ -48,6 +50,20 @@ GitBookClient client = GitBookClient.builder()
 
 ```java
 ApiInfo info = client.getApiInfo();
+```
+
+### Find the Currently Authenticated User
+
+The user will not be found if the access token is missing or invalid.
+
+```java
+Optional<User> user = client.findCurrentUser();
+```
+
+### Find a User by an ID
+
+```java
+Optional<User> user = client.findUserById("a0b1c2d3e4f5g6h7i8j9k0l1m2n3");
 ```
 
 # Spring Boot Starter
