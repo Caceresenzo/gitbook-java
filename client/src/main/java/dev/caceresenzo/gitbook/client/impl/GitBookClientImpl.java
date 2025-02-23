@@ -10,6 +10,7 @@ import dev.caceresenzo.gitbook.client.impl.auth.AuthRequestInterceptor;
 import dev.caceresenzo.gitbook.client.impl.page.PageSpliterator;
 import dev.caceresenzo.gitbook.model.ApiInfo;
 import dev.caceresenzo.gitbook.model.Organization;
+import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
 import dev.caceresenzo.gitbook.model.User;
 import dev.caceresenzo.gitbook.util.GitBookUtils;
@@ -87,6 +88,10 @@ public class GitBookClientImpl implements GitBookClient {
 
 	@Override
 	public Optional<Organization> findOrganizationById(String organizationId) {
+		if (organizationId == null) {
+			return Optional.empty();
+		}
+
 		try {
 			return Optional.of(delegate.getOrganizationById(organizationId));
 		} catch (GitBookClientException.OrganizationNotFound __) {
@@ -106,11 +111,20 @@ public class GitBookClientImpl implements GitBookClient {
 
 	@Override
 	public Optional<Space> findSpaceById(String spaceId) {
+		if (spaceId == null) {
+			return Optional.empty();
+		}
+
 		try {
 			return Optional.of(delegate.getSpaceById(spaceId));
 		} catch (GitBookClientException.SpaceNotFound __) {
 			return Optional.empty();
 		}
+	}
+
+	@Override
+	public RevisionPage getSpaceContent(String spaceId, String pagePath) {
+		return delegate.getSpaceContent(spaceId, pagePath);
 	}
 
 }

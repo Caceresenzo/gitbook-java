@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import dev.caceresenzo.gitbook.client.impl.GitBookClientImpl;
 import dev.caceresenzo.gitbook.model.ApiInfo;
 import dev.caceresenzo.gitbook.model.Organization;
+import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
 import dev.caceresenzo.gitbook.model.User;
 import lombok.Data;
@@ -29,6 +30,8 @@ public interface GitBookClient {
 	Stream<Space> findAllSpaces(String organizationId);
 
 	Optional<Space> findSpaceById(String spaceId);
+
+	RevisionPage getSpaceContent(String spaceId, String pagePath);
 
 	/**
 	 * Create a new builder.

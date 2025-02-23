@@ -14,7 +14,7 @@
 
 	<properties>
 		<feign.version>13.3</feign.version>
-		<jackson.version>2.17.2</jackson.version>
+		<jackson.version>2.18.0</jackson.version>
 		<lombok.version>1.18.34</lombok.version>
 
 		<junit.version>5.11.0</junit.version>
