@@ -211,6 +211,11 @@ public class GitBookClientImpl implements GitBookClient {
 		}
 	}
 
+	@Override
+	public Optional<ChangeRequest> findChangeRequestByNumber(String spaceId, int changeRequestNumber) {
+		return findChangeRequestById(spaceId, String.valueOf(changeRequestNumber));
+	}
+
 	private boolean isBlank(String value) {
 		return value == null || value.isBlank();
 	}

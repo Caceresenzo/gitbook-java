@@ -47,6 +47,8 @@ public interface GitBookClient {
 
 	Optional<ChangeRequest> findChangeRequestById(String spaceId, String changeRequestId);
 
+	Optional<ChangeRequest> findChangeRequestByNumber(String spaceId, int changeRequestNumber);
+
 	/**
 	 * Create a new builder.
 	 *
