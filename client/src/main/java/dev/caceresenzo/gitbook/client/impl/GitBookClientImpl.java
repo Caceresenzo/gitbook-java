@@ -1,5 +1,6 @@
 package dev.caceresenzo.gitbook.client.impl;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -9,6 +10,7 @@ import dev.caceresenzo.gitbook.client.GitBookClientException;
 import dev.caceresenzo.gitbook.client.impl.auth.AuthRequestInterceptor;
 import dev.caceresenzo.gitbook.client.impl.page.PageSpliterator;
 import dev.caceresenzo.gitbook.model.ApiInfo;
+import dev.caceresenzo.gitbook.model.ChangeRequest;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
@@ -39,6 +41,8 @@ public class GitBookClientImpl implements GitBookClient {
 		final var feignBuilder = Feign.builder()
 			.encoder(new JacksonEncoder(mapper))
 			.decoder(new JacksonDecoder(mapper))
+			.logLevel(feign.Logger.Level.FULL)
+			.logger(new feign.Logger.ErrorLogger())
 			.errorDecoder(new FeignGitBookErrorDecoder(mapper));
 
 		if (accessToken != null) {
@@ -65,7 +69,7 @@ public class GitBookClientImpl implements GitBookClient {
 
 	@Override
 	public Optional<User> findUserById(String userId) {
-		if (userId == null) {
+		if (isBlank(userId)) {
 			return Optional.empty();
 		}
 
@@ -88,7 +92,7 @@ public class GitBookClientImpl implements GitBookClient {
 
 	@Override
 	public Optional<Organization> findOrganizationById(String organizationId) {
-		if (organizationId == null) {
+		if (isBlank(organizationId)) {
 			return Optional.empty();
 		}
 
@@ -101,6 +105,10 @@ public class GitBookClientImpl implements GitBookClient {
 
 	@Override
 	public Stream<Space> findAllSpaces(String organizationId) {
+		if (isBlank(organizationId)) {
+			return Stream.empty();
+		}
+
 		final var firstPage = delegate.getSpaces(organizationId, maxPageSize);
 
 		return new PageSpliterator<>(
@@ -111,7 +119,7 @@ public class GitBookClientImpl implements GitBookClient {
 
 	@Override
 	public Optional<Space> findSpaceById(String spaceId) {
-		if (spaceId == null) {
+		if (isBlank(spaceId)) {
 			return Optional.empty();
 		}
 
@@ -125,6 +133,43 @@ public class GitBookClientImpl implements GitBookClient {
 	@Override
 	public RevisionPage getSpaceContent(String spaceId, String pagePath) {
 		return delegate.getSpaceContent(spaceId, pagePath);
+	}
+
+	@Override
+	public Stream<ChangeRequest> findAllChangeRequests(String spaceId) {
+		return Arrays.stream(ChangeRequest.Status.values())
+			.flatMap((status) -> findAllChangeRequests(spaceId, status));
+	}
+
+	@Override
+	public Stream<ChangeRequest> findAllChangeRequests(String spaceId, ChangeRequest.Status status) {
+		if (isBlank(spaceId)) {
+			return Stream.empty();
+		}
+
+		final var firstPage = delegate.getChangeRequests(spaceId, status, maxPageSize, null);
+
+		return new PageSpliterator<>(
+			firstPage,
+			(nextCursor) -> delegate.getChangeRequests(spaceId, status, maxPageSize, nextCursor)
+		).asStream();
+	}
+
+	@Override
+	public Optional<ChangeRequest> findChangeRequestById(String spaceId, String changeRequestId) {
+		if (isBlank(spaceId) || isBlank(changeRequestId)) {
+			return Optional.empty();
+		}
+
+		try {
+			return Optional.of(delegate.getChangeRequestById(spaceId, changeRequestId));
+		} catch (GitBookClientException.SpaceNotFound | GitBookClientException.ChangeRequestNotFound __) {
+			return Optional.empty();
+		}
+	}
+
+	private boolean isBlank(String value) {
+		return value == null || value.isBlank();
 	}
 
 }

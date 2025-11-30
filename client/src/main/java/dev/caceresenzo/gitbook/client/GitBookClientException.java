@@ -21,5 +21,8 @@ public class GitBookClientException extends GitBookException {
 
 	@StandardException
 	public static class SpaceNotFound extends GitBookClientException {}
+	
+	@StandardException
+	public static class ChangeRequestNotFound extends GitBookClientException {}
 
 }

@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import dev.caceresenzo.gitbook.client.impl.GitBookClientImpl;
 import dev.caceresenzo.gitbook.model.ApiInfo;
+import dev.caceresenzo.gitbook.model.ChangeRequest;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
@@ -32,6 +33,12 @@ public interface GitBookClient {
 	Optional<Space> findSpaceById(String spaceId);
 
 	RevisionPage getSpaceContent(String spaceId, String pagePath);
+
+	Stream<ChangeRequest> findAllChangeRequests(String spaceId);
+
+	Stream<ChangeRequest> findAllChangeRequests(String spaceId, ChangeRequest.Status status);
+
+	Optional<ChangeRequest> findChangeRequestById(String spaceId, String changeRequestId);
 
 	/**
 	 * Create a new builder.
