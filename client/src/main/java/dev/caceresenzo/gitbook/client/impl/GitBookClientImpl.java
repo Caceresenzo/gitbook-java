@@ -1,6 +1,7 @@
 package dev.caceresenzo.gitbook.client.impl;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -11,10 +12,11 @@ import dev.caceresenzo.gitbook.client.impl.auth.AuthRequestInterceptor;
 import dev.caceresenzo.gitbook.client.impl.page.PageSpliterator;
 import dev.caceresenzo.gitbook.model.ApiInfo;
 import dev.caceresenzo.gitbook.model.ChangeRequest;
+import dev.caceresenzo.gitbook.model.File;
 import dev.caceresenzo.gitbook.model.Organization;
+import dev.caceresenzo.gitbook.model.Page;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
-import dev.caceresenzo.gitbook.model.SpaceFile;
 import dev.caceresenzo.gitbook.model.User;
 import dev.caceresenzo.gitbook.util.GitBookUtils;
 import feign.Feign;
@@ -149,7 +151,21 @@ public class GitBookClientImpl implements GitBookClient {
 	}
 
 	@Override
-	public Stream<SpaceFile> findAllSpaceFiles(String spaceId) {
+	public Optional<List<Page>> getSpacePages(String spaceId) {
+		if (isBlank(spaceId)) {
+			return Optional.empty();
+		}
+
+		try {
+			final var response = delegate.getSpacePages(spaceId, maxPageSize, null);
+			return Optional.of(response.getPages());
+		} catch (GitBookClientException.SpaceNotFound __) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Stream<File> findAllSpaceFiles(String spaceId) {
 		if (isBlank(spaceId)) {
 			return Stream.empty();
 		}

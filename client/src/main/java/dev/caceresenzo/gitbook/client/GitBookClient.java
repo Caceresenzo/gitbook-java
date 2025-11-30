@@ -1,15 +1,17 @@
 package dev.caceresenzo.gitbook.client;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import dev.caceresenzo.gitbook.client.impl.GitBookClientImpl;
 import dev.caceresenzo.gitbook.model.ApiInfo;
 import dev.caceresenzo.gitbook.model.ChangeRequest;
+import dev.caceresenzo.gitbook.model.File;
 import dev.caceresenzo.gitbook.model.Organization;
+import dev.caceresenzo.gitbook.model.Page;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
-import dev.caceresenzo.gitbook.model.SpaceFile;
 import dev.caceresenzo.gitbook.model.User;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -35,7 +37,9 @@ public interface GitBookClient {
 
 	Optional<RevisionPage> getSpaceContent(String spaceId, String pagePath);
 
-	Stream<SpaceFile> findAllSpaceFiles(String spaceId);
+	Optional<List<Page>> getSpacePages(String spaceId);
+
+	Stream<File> findAllSpaceFiles(String spaceId);
 
 	Stream<ChangeRequest> findAllChangeRequests(String spaceId);
 

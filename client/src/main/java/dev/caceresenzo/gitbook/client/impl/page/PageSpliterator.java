@@ -13,12 +13,12 @@ import lombok.Data;
 @Data
 public class PageSpliterator<T> implements Spliterator<T> {
 
-	private final Function<String, Page<T>> nextPageGetter;
+	private final Function<String, Paginated<T>> nextPageGetter;
 
 	private Iterator<T> currentIterator;
 	private String nextCursor;
 
-	public PageSpliterator(Page<T> firstPage, Function<String, Page<T>> nextPageGetter) {
+	public PageSpliterator(Paginated<T> firstPage, Function<String, Paginated<T>> nextPageGetter) {
 		this.nextPageGetter = Objects.requireNonNull(nextPageGetter);
 
 		setPage(firstPage);
@@ -62,7 +62,7 @@ public class PageSpliterator<T> implements Spliterator<T> {
 		return ORDERED | NONNULL;
 	}
 
-	public void setPage(Page<T> page) {
+	public void setPage(Paginated<T> page) {
 		this.currentIterator = page.items().iterator();
 		this.nextCursor = page.nextCursor();
 	}

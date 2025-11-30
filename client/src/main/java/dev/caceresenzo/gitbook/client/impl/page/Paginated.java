@@ -2,7 +2,7 @@ package dev.caceresenzo.gitbook.client.impl.page;
 
 import java.util.List;
 
-public record Page<T>(
+public record Paginated<T>(
 	List<T> items,
 	Next next
 ) {
