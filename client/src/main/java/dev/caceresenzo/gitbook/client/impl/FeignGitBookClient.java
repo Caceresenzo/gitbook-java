@@ -50,7 +50,7 @@ public interface FeignGitBookClient {
 
 	@RequestLine("GET /v1/spaces/{spaceId}/content/pages?limit={limit}&page={page}")
 	SpacePagesResponse getSpacePages(@Param String spaceId, @Param long limit, @Param String page);
-	
+
 	@RequestLine("GET /v1/spaces/{spaceId}/content/files?limit={limit}&page={page}")
 	Paginated<File> getSpaceFiles(@Param String spaceId, @Param long limit, @Param String page);
 
@@ -59,5 +59,14 @@ public interface FeignGitBookClient {
 
 	@RequestLine("GET /v1/spaces/{spaceId}/change-requests/{changeRequestId}")
 	ChangeRequest getChangeRequestById(@Param String spaceId, @Param String changeRequestId);
+
+	@RequestLine(value = "GET /v1/spaces/{spaceId}/change-requests/{changeRequestId}/content/path/{pagePath}", decodeSlash = false)
+	RevisionPage getChangeRequestContent(@Param String spaceId, @Param String changeRequestId, @Param(expander = EncodeSlashExpander.class) String pagePath);
+
+	@RequestLine("GET /v1/spaces/{spaceId}/change-requests/{changeRequestId}/content/pages?limit={limit}&page={page}")
+	SpacePagesResponse getChangeRequestPages(@Param String spaceId, @Param String changeRequestId, @Param long limit, @Param String page);
+
+	@RequestLine("GET /v1/spaces/{spaceId}/change-requests/{changeRequestId}/content/files?limit={limit}&page={page}")
+	Paginated<File> getChangeRequestFiles(@Param String spaceId, @Param String changeRequestId, @Param long limit, @Param String page);
 
 }

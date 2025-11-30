@@ -49,6 +49,12 @@ public interface GitBookClient {
 
 	Optional<ChangeRequest> findChangeRequestByNumber(String spaceId, int changeRequestNumber);
 
+	Optional<RevisionPage> getChangeRequestContent(String spaceId, String changeRequestId, String pagePath);
+
+	Optional<List<Page>> getChangeRequestPages(String spaceId, String changeRequestId);
+
+	Stream<File> findAllChangeRequestFiles(String spaceId, String changeRequestId);
+
 	/**
 	 * Create a new builder.
 	 *

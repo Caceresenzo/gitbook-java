@@ -216,6 +216,51 @@ public class GitBookClientImpl implements GitBookClient {
 		return findChangeRequestById(spaceId, String.valueOf(changeRequestNumber));
 	}
 
+	@Override
+	public Optional<RevisionPage> getChangeRequestContent(String spaceId, String changeRequestId, String pagePath) {
+		if (isBlank(spaceId) || isBlank(changeRequestId)) {
+			return Optional.empty();
+		}
+
+		if (isBlank(pagePath)) {
+			pagePath = "/";
+		}
+
+		try {
+			return Optional.of(delegate.getChangeRequestContent(spaceId, changeRequestId, pagePath));
+		} catch (GitBookClientException.SpaceNotFound | GitBookClientException.ChangeRequestNotFound | GitBookClientException.RevisionPageNotFound __) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<List<Page>> getChangeRequestPages(String spaceId, String changeRequestId) {
+		if (isBlank(spaceId) || isBlank(changeRequestId)) {
+			return Optional.empty();
+		}
+
+		try {
+			final var response = delegate.getChangeRequestPages(spaceId, changeRequestId, maxPageSize, null);
+			return Optional.of(response.getPages());
+		} catch (GitBookClientException.SpaceNotFound | GitBookClientException.ChangeRequestNotFound __) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Stream<File> findAllChangeRequestFiles(String spaceId, String changeRequestId) {
+		if (isBlank(spaceId) || isBlank(changeRequestId)) {
+			return Stream.empty();
+		}
+
+		final var firstPage = delegate.getChangeRequestFiles(spaceId, changeRequestId, maxPageSize, null);
+
+		return new PageSpliterator<>(
+			firstPage,
+			(nextCursor) -> delegate.getChangeRequestFiles(spaceId, changeRequestId, maxPageSize, nextCursor)
+		).asStream();
+	}
+
 	private boolean isBlank(String value) {
 		return value == null || value.isBlank();
 	}
