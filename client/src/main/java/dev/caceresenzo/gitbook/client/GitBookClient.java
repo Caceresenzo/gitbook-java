@@ -33,7 +33,7 @@ public interface GitBookClient {
 
 	Optional<Space> findSpaceById(String spaceId);
 
-	RevisionPage getSpaceContent(String spaceId, String pagePath);
+	Optional<RevisionPage> getSpaceContent(String spaceId, String pagePath);
 
 	Stream<SpaceFile> findAllSpaceFiles(String spaceId);
 

@@ -132,8 +132,20 @@ public class GitBookClientImpl implements GitBookClient {
 	}
 
 	@Override
-	public RevisionPage getSpaceContent(String spaceId, String pagePath) {
-		return delegate.getSpaceContent(spaceId, pagePath);
+	public Optional<RevisionPage> getSpaceContent(String spaceId, String pagePath) {
+		if (isBlank(spaceId)) {
+			return Optional.empty();
+		}
+
+		if (isBlank(pagePath)) {
+			pagePath = "/";
+		}
+
+		try {
+			return Optional.of(delegate.getSpaceContent(spaceId, pagePath));
+		} catch (GitBookClientException.SpaceNotFound | GitBookClientException.RevisionPageNotFound __) {
+			return Optional.empty();
+		}
 	}
 
 	@Override
