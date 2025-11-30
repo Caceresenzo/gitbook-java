@@ -9,6 +9,7 @@ import dev.caceresenzo.gitbook.model.ChangeRequest;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
+import dev.caceresenzo.gitbook.model.SpaceFile;
 import dev.caceresenzo.gitbook.model.User;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -33,6 +34,8 @@ public interface GitBookClient {
 	Optional<Space> findSpaceById(String spaceId);
 
 	RevisionPage getSpaceContent(String spaceId, String pagePath);
+
+	Stream<SpaceFile> findAllSpaceFiles(String spaceId);
 
 	Stream<ChangeRequest> findAllChangeRequests(String spaceId);
 

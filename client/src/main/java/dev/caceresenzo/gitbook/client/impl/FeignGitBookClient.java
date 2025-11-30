@@ -8,6 +8,7 @@ import dev.caceresenzo.gitbook.model.ChangeRequest;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
+import dev.caceresenzo.gitbook.model.SpaceFile;
 import dev.caceresenzo.gitbook.model.User;
 import feign.Param;
 import feign.RequestLine;
@@ -46,10 +47,13 @@ public interface FeignGitBookClient {
 	@RequestLine(value = "GET /v1/spaces/{spaceId}/content/path/{pagePath}", decodeSlash = false)
 	RevisionPage getSpaceContent(@Param String spaceId, @Param(expander = EncodeSlashExpander.class) String pagePath);
 
-	@RequestLine(value = "GET /v1/spaces/{spaceId}/change-requests?status={status}&limit={limit}&page={page}")
+	@RequestLine("GET /v1/spaces/{spaceId}/content/files?limit={limit}&page={page}")
+	Page<SpaceFile> getSpaceFiles(@Param String spaceId, @Param long limit, @Param String page);
+
+	@RequestLine("GET /v1/spaces/{spaceId}/change-requests?status={status}&limit={limit}&page={page}")
 	Page<ChangeRequest> getChangeRequests(@Param String spaceId, @Param(expander = ToLowerStringExpander.class) ChangeRequest.Status status, @Param long limit, @Param String page);
 
-	@RequestLine(value = "GET /v1/spaces/{spaceId}/change-requests/{changeRequestId}")
+	@RequestLine("GET /v1/spaces/{spaceId}/change-requests/{changeRequestId}")
 	ChangeRequest getChangeRequestById(@Param String spaceId, @Param String changeRequestId);
 
 }

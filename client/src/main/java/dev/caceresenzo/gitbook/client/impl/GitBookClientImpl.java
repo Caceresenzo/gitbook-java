@@ -14,6 +14,7 @@ import dev.caceresenzo.gitbook.model.ChangeRequest;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Space;
+import dev.caceresenzo.gitbook.model.SpaceFile;
 import dev.caceresenzo.gitbook.model.User;
 import dev.caceresenzo.gitbook.util.GitBookUtils;
 import feign.Feign;
@@ -133,6 +134,20 @@ public class GitBookClientImpl implements GitBookClient {
 	@Override
 	public RevisionPage getSpaceContent(String spaceId, String pagePath) {
 		return delegate.getSpaceContent(spaceId, pagePath);
+	}
+
+	@Override
+	public Stream<SpaceFile> findAllSpaceFiles(String spaceId) {
+		if (isBlank(spaceId)) {
+			return Stream.empty();
+		}
+
+		final var firstPage = delegate.getSpaceFiles(spaceId, maxPageSize, null);
+
+		return new PageSpliterator<>(
+			firstPage,
+			(nextCursor) -> delegate.getSpaceFiles(spaceId, maxPageSize, nextCursor)
+		).asStream();
 	}
 
 	@Override
