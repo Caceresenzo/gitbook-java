@@ -11,32 +11,53 @@ import com.fasterxml.jackson.databind.deser.std.DelegatingDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import dev.caceresenzo.gitbook.model.document.Block;
-import dev.caceresenzo.gitbook.model.document.Inline;
+import dev.caceresenzo.gitbook.model.document.Annotation;
+import dev.caceresenzo.gitbook.model.document.Code;
+import dev.caceresenzo.gitbook.model.document.CodeLine;
+import dev.caceresenzo.gitbook.model.document.Heading1;
+import dev.caceresenzo.gitbook.model.document.Heading2;
+import dev.caceresenzo.gitbook.model.document.Heading3;
+import dev.caceresenzo.gitbook.model.document.Image;
+import dev.caceresenzo.gitbook.model.document.Images;
+import dev.caceresenzo.gitbook.model.document.Link;
+import dev.caceresenzo.gitbook.model.document.ListItem;
 import dev.caceresenzo.gitbook.model.document.Node;
+import dev.caceresenzo.gitbook.model.document.OrderedList;
+import dev.caceresenzo.gitbook.model.document.Other;
+import dev.caceresenzo.gitbook.model.document.Paragraph;
+import dev.caceresenzo.gitbook.model.document.Table;
+import dev.caceresenzo.gitbook.model.document.Text;
+import dev.caceresenzo.gitbook.model.document.UnorderedList;
 
 @SuppressWarnings("serial")
 public class NodeDelegatingDeserializer extends DelegatingDeserializer {
 
 	public static final String DISCRIMINATOR = "$class";
 
-	private static final Map<String, Class<?>> TYPES = new HashMap<>();
+	private static final Map<String, Class<? extends Node>> TYPES = new HashMap<>();
+	private static final Map<String, Class<? extends Node>> FALLBACKS = new HashMap<>();
 
 	static {
-		TYPES.put("block:heading-1", Block.Heading1.class);
-		TYPES.put("block:heading-2", Block.Heading2.class);
-		TYPES.put("block:heading-3", Block.Heading3.class);
-		TYPES.put("block:paragraph", Block.Paragraph.class);
-		TYPES.put("block:list-item", Block.ListItem.class);
-		TYPES.put("block:list-ordered", Block.OrderedList.class);
-		TYPES.put("block:list-unordered", Block.UnorderedList.class);
-		TYPES.put("block:table", Block.Table.class);
+		TYPES.put("block:heading-1", Heading1.class);
+		TYPES.put("block:heading-2", Heading2.class);
+		TYPES.put("block:heading-3", Heading3.class);
+		TYPES.put("block:paragraph", Paragraph.class);
+		TYPES.put("block:list-item", ListItem.class);
+		TYPES.put("block:list-ordered", OrderedList.class);
+		TYPES.put("block:list-unordered", UnorderedList.class);
+		TYPES.put("block:table", Table.class);
+		TYPES.put("block:code", Code.class);
+		TYPES.put("block:code-line", CodeLine.class);
+		TYPES.put("block:images", Images.class);
+		TYPES.put("block:image", Image.class);
+		FALLBACKS.put("block", Other.class);
 
-		TYPES.put("text:", Node.Text.class);
+		TYPES.put("text:", Text.class);
 
-		TYPES.put("inline:link", Inline.Link.class);
-		TYPES.put("block:images", Inline.Other.class);
-		TYPES.put("inline:inline-image", Inline.Other.class);
+		TYPES.put("inline:annotation", Annotation.class);
+		TYPES.put("inline:link", Link.class);
+		//		TYPES.put("block:images", Inline.Other.class);
+		//		TYPES.put("inline:inline-image", Inline.Other.class);
 	}
 
 	public NodeDelegatingDeserializer(JsonDeserializer<?> delegate) {
@@ -62,21 +83,17 @@ public class NodeDelegatingDeserializer extends DelegatingDeserializer {
 
 		var clazz = TYPES.get(discriminator);
 		if (clazz == null) {
-			System.out.println(discriminator);
-			return null;
+			clazz = Other.class;
+			root.put("type", type);
 		}
+
+		//		System.out.println(root);
 
 		parser = codec.treeAsTokens(root);
 		parser.nextToken();
 
 		final var deserializer = context.findRootValueDeserializer(context.constructType(clazz));
 		final var value = deserializer.deserialize(parser, context);
-
-		if (value instanceof Block.Table table) {
-			System.out.println(table);
-		} else {
-			System.out.println(value.getClass());
-		}
 
 		return value;
 	}

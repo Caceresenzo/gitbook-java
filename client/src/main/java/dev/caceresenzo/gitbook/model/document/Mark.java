@@ -6,9 +6,6 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import dev.caceresenzo.gitbook.util.GitBookUtils;
-import lombok.SneakyThrows;
-
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, defaultImpl = Mark.Other.class)
 @JsonSubTypes({
 	@JsonSubTypes.Type(value = Mark.Bold.class, name = "bold"),
@@ -36,23 +33,5 @@ public sealed interface Mark {
 		String type,
 		@JsonAnySetter Map<String, Object> properties
 	) implements Mark {}
-
-	@SneakyThrows
-	public static void main(String[] args) {
-		final var mapper = GitBookUtils.createMapper();
-
-		final var mark = mapper.readValue("""
-			{
-			                         "object": "mark",
-			                         "type": "xcolor",
-			                         "data": {
-			                           "background": "default",
-			                           "text": "blue"
-			                         }
-			                       }
-			""", Mark.class);
-
-		System.out.println(mark);
-	}
 
 }

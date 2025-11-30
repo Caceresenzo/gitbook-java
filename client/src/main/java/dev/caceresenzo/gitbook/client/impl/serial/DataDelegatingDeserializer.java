@@ -31,9 +31,15 @@ public class DataDelegatingDeserializer extends DelegatingDeserializer {
 			root.setAll(data);
 		}
 
+		if (root.remove("meta") instanceof ObjectNode meta) {
+			root.setAll(meta);
+		}
+
 		if (root.remove("nodes") instanceof ArrayNode children) {
 			root.set("children", children);
 		}
+
+		System.out.println(root);
 
 		parser = codec.treeAsTokens(root);
 		parser.nextToken();

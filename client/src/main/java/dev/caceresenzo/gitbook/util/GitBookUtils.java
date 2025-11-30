@@ -12,10 +12,10 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import dev.caceresenzo.gitbook.client.impl.serial.DataDelegatingDeserializer;
 import dev.caceresenzo.gitbook.client.impl.serial.NodeDelegatingDeserializer;
-import dev.caceresenzo.gitbook.model.document.Inline;
 import dev.caceresenzo.gitbook.model.document.Mark;
 import dev.caceresenzo.gitbook.model.document.Node;
 import lombok.SneakyThrows;
@@ -35,6 +35,7 @@ public class GitBookUtils {
 			.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
 			.addModule(new JavaTimeModule())
 			.addModule(new NodeModule())
+			.addModule(new ParameterNamesModule())
 			.build();
 	}
 
@@ -53,9 +54,9 @@ public class GitBookUtils {
 					BeanDescription beanDesc,
 					JsonDeserializer<?> deserializer
 				) {
-//					System.out.println("GitBookUtils.NodeModule.setupModule(...).new BeanDeserializerModifier() {...}.modifyDeserializer()  " + beanDesc.getBeanClass());
+					//					System.out.println("GitBookUtils.NodeModule.setupModule(...).new BeanDeserializerModifier() {...}.modifyDeserializer()  " + beanDesc.getBeanClass());
 
-					if (Node.class.equals(beanDesc.getBeanClass()) || Inline.class.equals(beanDesc.getBeanClass()) || Mark.class.equals(beanDesc.getBeanClass())) {
+					if (Node.class.equals(beanDesc.getBeanClass()) || Mark.class.equals(beanDesc.getBeanClass())) {
 						deserializer = new NodeDelegatingDeserializer(deserializer);
 					} else if (Node.class.isAssignableFrom(beanDesc.getBeanClass()) || Mark.class.isAssignableFrom(beanDesc.getBeanClass())) {
 						deserializer = new DataDelegatingDeserializer(deserializer);
