@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -13,12 +12,18 @@ import lombok.Data;
 @Data
 public class PageSpliterator<T> implements Spliterator<T> {
 
-	private final Function<String, Paginated<T>> nextPageGetter;
+	private final int pageSize;
+	private final NextPageGetter<T> nextPageGetter;
 
 	private Iterator<T> currentIterator;
 	private String nextCursor;
 
-	public PageSpliterator(Paginated<T> firstPage, Function<String, Paginated<T>> nextPageGetter) {
+	public PageSpliterator(
+		int pageSize,
+		NextPageGetter<T> nextPageGetter,
+		Paginated<T> firstPage
+	) {
+		this.pageSize = pageSize;
 		this.nextPageGetter = Objects.requireNonNull(nextPageGetter);
 
 		setPage(firstPage);
@@ -35,7 +40,7 @@ public class PageSpliterator<T> implements Spliterator<T> {
 				return false;
 			}
 
-			final var nextPage = nextPageGetter.apply(nextCursor);
+			final var nextPage = nextPageGetter.fetch(pageSize, nextCursor);
 			if (nextPage.isEmpty()) {
 				return false;
 			}
@@ -69,6 +74,16 @@ public class PageSpliterator<T> implements Spliterator<T> {
 
 	public Stream<T> asStream() {
 		return StreamSupport.stream(this, false);
+	}
+
+	public static <T> PageSpliterator<T> of(int pageSize, NextPageGetter<T> nextPageGetter) {
+		final var firstPage = nextPageGetter.fetch(pageSize, null);
+
+		return new PageSpliterator<>(
+			pageSize,
+			nextPageGetter,
+			firstPage
+		);
 	}
 
 }

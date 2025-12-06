@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import dev.caceresenzo.gitbook.client.GitBookClient;
 import dev.caceresenzo.gitbook.client.GitBookClientException;
 import dev.caceresenzo.gitbook.client.impl.auth.AuthRequestInterceptor;
+import dev.caceresenzo.gitbook.client.impl.page.NextPageGetter;
 import dev.caceresenzo.gitbook.client.impl.page.PageSpliterator;
 import dev.caceresenzo.gitbook.model.ApiInfo;
 import dev.caceresenzo.gitbook.model.ChangeRequest;
@@ -25,13 +26,13 @@ import feign.jackson.JacksonEncoder;
 
 public class GitBookClientImpl implements GitBookClient {
 
-	private final long maxPageSize;
+	private final int maxPageSize;
 	private final FeignGitBookClient delegate;
 
 	public GitBookClientImpl(
 		String apiUrl,
 		String accessToken,
-		long maxPageSize
+		int maxPageSize
 	) {
 		Objects.requireNonNull(apiUrl, "apiUrl must be specified");
 
@@ -85,12 +86,7 @@ public class GitBookClientImpl implements GitBookClient {
 
 	@Override
 	public Stream<Organization> findAllOrganizations() {
-		final var firstPage = delegate.getOrganizations(maxPageSize);
-
-		return new PageSpliterator<>(
-			firstPage,
-			(nextCursor) -> delegate.getOrganizations(maxPageSize, nextCursor)
-		).asStream();
+		return asStream(delegate::getOrganizations);
 	}
 
 	@Override
@@ -112,12 +108,7 @@ public class GitBookClientImpl implements GitBookClient {
 			return Stream.empty();
 		}
 
-		final var firstPage = delegate.getSpaces(organizationId, maxPageSize);
-
-		return new PageSpliterator<>(
-			firstPage,
-			(nextCursor) -> delegate.getSpaces(organizationId, maxPageSize, nextCursor)
-		).asStream();
+		return asStream((pageSize, nextCursor) -> delegate.getSpaces(organizationId, pageSize, nextCursor));
 	}
 
 	@Override
@@ -170,12 +161,7 @@ public class GitBookClientImpl implements GitBookClient {
 			return Stream.empty();
 		}
 
-		final var firstPage = delegate.getSpaceFiles(spaceId, maxPageSize, null);
-
-		return new PageSpliterator<>(
-			firstPage,
-			(nextCursor) -> delegate.getSpaceFiles(spaceId, maxPageSize, nextCursor)
-		).asStream();
+		return asStream((pageSize, nextCursor) -> delegate.getSpaceFiles(spaceId, pageSize, nextCursor));
 	}
 
 	@Override
@@ -190,12 +176,7 @@ public class GitBookClientImpl implements GitBookClient {
 			return Stream.empty();
 		}
 
-		final var firstPage = delegate.getChangeRequests(spaceId, status, maxPageSize, null);
-
-		return new PageSpliterator<>(
-			firstPage,
-			(nextCursor) -> delegate.getChangeRequests(spaceId, status, maxPageSize, nextCursor)
-		).asStream();
+		return asStream((pageSize, nextCursor) -> delegate.getChangeRequests(spaceId, status, pageSize, nextCursor));
 	}
 
 	@Override
@@ -253,16 +234,18 @@ public class GitBookClientImpl implements GitBookClient {
 			return Stream.empty();
 		}
 
-		final var firstPage = delegate.getChangeRequestFiles(spaceId, changeRequestId, maxPageSize, null);
-
-		return new PageSpliterator<>(
-			firstPage,
-			(nextCursor) -> delegate.getChangeRequestFiles(spaceId, changeRequestId, maxPageSize, nextCursor)
-		).asStream();
+		return asStream((pageSize, nextCursor) -> delegate.getChangeRequestFiles(spaceId, changeRequestId, pageSize, nextCursor));
 	}
 
 	private boolean isBlank(String value) {
 		return value == null || value.isBlank();
+	}
+
+	private <T> Stream<T> asStream(NextPageGetter<T> nextPageGetter) {
+		return PageSpliterator.of(
+			maxPageSize,
+			nextPageGetter
+		).asStream();
 	}
 
 }
