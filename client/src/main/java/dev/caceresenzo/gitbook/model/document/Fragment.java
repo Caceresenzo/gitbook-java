@@ -2,28 +2,20 @@ package dev.caceresenzo.gitbook.model.document;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 
-@Getter(onMethod_ = @JsonCreator)
-@Accessors(fluent = true)
-@RequiredArgsConstructor
+@Data
 public class Fragment {
 
+	@JsonProperty("key")
 	private final String key;
-	private final List<Node> nodes;
-	private final String name;
 
-	@JsonCreator
-	public static Fragment fromJson(
-		String key,
-		List<Node> nodes,
-		String name
-	) {
-		return new Fragment(key, nodes, name);
-	}
+	@JsonProperty("nodes")
+	private final List<Node> nodes;
+
+	@JsonProperty("fragment")
+	private final String name;
 
 }

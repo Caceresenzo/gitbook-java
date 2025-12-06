@@ -2,29 +2,17 @@ package dev.caceresenzo.gitbook.model.document;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.Data;
 
-@Getter(onMethod_ = @JsonCreator)
-@Accessors(fluent = true)
-public final class Text extends SimpleNode implements Node {
+@Data
+public final class Text implements Node {
 
-	private final List<Leaf> leaves;
+	@JsonProperty("key")
+	private String key;
 
-	private Text(String key, List<Leaf> leaves) {
-		super(key, null);
-
-		this.leaves = leaves;
-	}
-
-	@JsonCreator
-	public static Text fromJson(
-		String key,
-		List<Leaf> leaves
-	) {
-		return new Text(key, leaves);
-	}
+	@JsonProperty("leaves")
+	private List<Leaf> leaves;
 
 }

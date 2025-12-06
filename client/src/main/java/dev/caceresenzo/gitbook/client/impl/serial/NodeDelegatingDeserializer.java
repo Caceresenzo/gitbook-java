@@ -8,26 +8,14 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.std.DelegatingDeserializer;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import dev.caceresenzo.gitbook.model.document.Annotation;
-import dev.caceresenzo.gitbook.model.document.Code;
-import dev.caceresenzo.gitbook.model.document.CodeLine;
-import dev.caceresenzo.gitbook.model.document.Heading1;
-import dev.caceresenzo.gitbook.model.document.Heading2;
-import dev.caceresenzo.gitbook.model.document.Heading3;
-import dev.caceresenzo.gitbook.model.document.Image;
-import dev.caceresenzo.gitbook.model.document.Images;
-import dev.caceresenzo.gitbook.model.document.Link;
-import dev.caceresenzo.gitbook.model.document.ListItem;
+import dev.caceresenzo.gitbook.model.document.Block;
+import dev.caceresenzo.gitbook.model.document.Inline;
 import dev.caceresenzo.gitbook.model.document.Node;
-import dev.caceresenzo.gitbook.model.document.OrderedList;
-import dev.caceresenzo.gitbook.model.document.Other;
-import dev.caceresenzo.gitbook.model.document.Paragraph;
-import dev.caceresenzo.gitbook.model.document.Table;
 import dev.caceresenzo.gitbook.model.document.Text;
-import dev.caceresenzo.gitbook.model.document.UnorderedList;
 
 @SuppressWarnings("serial")
 public class NodeDelegatingDeserializer extends DelegatingDeserializer {
@@ -38,24 +26,43 @@ public class NodeDelegatingDeserializer extends DelegatingDeserializer {
 	private static final Map<String, Class<? extends Node>> FALLBACKS = new HashMap<>();
 
 	static {
-		TYPES.put("block:heading-1", Heading1.class);
-		TYPES.put("block:heading-2", Heading2.class);
-		TYPES.put("block:heading-3", Heading3.class);
-		TYPES.put("block:paragraph", Paragraph.class);
-		TYPES.put("block:list-item", ListItem.class);
-		TYPES.put("block:list-ordered", OrderedList.class);
-		TYPES.put("block:list-unordered", UnorderedList.class);
-		TYPES.put("block:table", Table.class);
-		TYPES.put("block:code", Code.class);
-		TYPES.put("block:code-line", CodeLine.class);
-		TYPES.put("block:images", Images.class);
-		TYPES.put("block:image", Image.class);
-		FALLBACKS.put("block", Other.class);
+		TYPES.put("block:heading-1", Block.Heading1.class);
+		TYPES.put("block:heading-2", Block.Heading2.class);
+		TYPES.put("block:heading-3", Block.Heading3.class);
+		TYPES.put("block:paragraph", Block.Paragraph.class);
+		TYPES.put("block:list-item", Block.ListItem.class);
+		TYPES.put("block:list-ordered", Block.OrderedList.class);
+		TYPES.put("block:list-unordered", Block.UnorderedList.class);
+		TYPES.put("block:table", Block.Table.class);
+		TYPES.put("block:code", Block.Code.class);
+		TYPES.put("block:code-line", Block.CodeLine.class);
+		TYPES.put("block:images", Block.Images.class);
+		TYPES.put("block:image", Block.Image.class);
+		TYPES.put("block:divider", Block.Divider.class);
+		TYPES.put("block:embed", Block.Embed.class);
+		TYPES.put("block:hint", Block.Hint.class);
+		TYPES.put("block:math", Block.Math.class);
+		TYPES.put("block:expandable", Block.Expandable.class);
+		TYPES.put("block:list-tasks", Block.TaskList.class);
+		TYPES.put("block:blockquote", Block.Quote.class);
+		TYPES.put("block:tabs", Block.Tabs.class);
+		TYPES.put("block:tabs-item", Block.Tab.class);
+		TYPES.put("block:stepper", Block.Stepper.class);
+		TYPES.put("block:stepper-step", Block.StepperStep.class);
+		TYPES.put("block:updates", Block.Updates.class);
+		TYPES.put("block:update", Block.Update.class);
+		TYPES.put("block:drawing", Block.Drawing.class);
+		TYPES.put("block:content-ref", Block.PageLink.class);
+		TYPES.put("block:columns", Block.Columns.class);
+		TYPES.put("block:column", Block.Column.class);
+		FALLBACKS.put("block", Block.Other.class);
 
 		TYPES.put("text:", Text.class);
 
-		TYPES.put("inline:annotation", Annotation.class);
-		TYPES.put("inline:link", Link.class);
+		TYPES.put("inline:annotation", Inline.Annotation.class);
+		TYPES.put("inline:link", Inline.Link.class);
+		TYPES.put("inline:mention", Inline.Mention.class);
+		TYPES.put("inline:inline-math", Inline.Math.class);
 		//		TYPES.put("block:images", Inline.Other.class);
 		//		TYPES.put("inline:inline-image", Inline.Other.class);
 	}
@@ -83,8 +90,10 @@ public class NodeDelegatingDeserializer extends DelegatingDeserializer {
 
 		var clazz = TYPES.get(discriminator);
 		if (clazz == null) {
-			clazz = Other.class;
-			root.put("type", type);
+			System.err.println(root);
+			throw new UnsupportedOperationException(discriminator);
+			//			clazz = Node.Other.class;
+			//			root.put("type", discriminator);
 		}
 
 		//		System.out.println(root);
@@ -94,6 +103,14 @@ public class NodeDelegatingDeserializer extends DelegatingDeserializer {
 
 		final var deserializer = context.findRootValueDeserializer(context.constructType(clazz));
 		final var value = deserializer.deserialize(parser, context);
+
+		if (value instanceof Block block) {
+			final var isVoid = root.remove("isVoid") instanceof BooleanNode booleanNode && booleanNode.booleanValue();
+
+			if (isVoid) {
+				block.getChildren().clear();
+			}
+		}
 
 		return value;
 	}

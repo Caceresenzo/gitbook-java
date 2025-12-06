@@ -28,18 +28,32 @@ public class DataDelegatingDeserializer extends DelegatingDeserializer {
 		final var root = codec.<ObjectNode>readTree(parser);
 
 		if (root.remove("data") instanceof ObjectNode data) {
-			root.setAll(data);
+			final var iterator = data.fields();
+
+			while (iterator.hasNext()) {
+				final var entry = iterator.next();
+				root.set("data.%s".formatted(entry.getKey()), entry.getValue());
+			}
 		}
 
 		if (root.remove("meta") instanceof ObjectNode meta) {
-			root.setAll(meta);
+			final var iterator = meta.fields();
+
+			while (iterator.hasNext()) {
+				final var entry = iterator.next();
+				root.set("meta.%s".formatted(entry.getKey()), entry.getValue());
+			}
 		}
 
-		if (root.remove("nodes") instanceof ArrayNode children) {
-			root.set("children", children);
-		}
+		if (root.remove("fragments") instanceof ArrayNode fragments) {
+			for (final var fragment : fragments) {
+				if (fragment instanceof ObjectNode fragmentObject) {
+					final var name = fragmentObject.get("fragment").asText();
 
-		System.out.println(root);
+					root.set("fragment.%s".formatted(name), fragmentObject);
+				}
+			}
+		}
 
 		parser = codec.treeAsTokens(root);
 		parser.nextToken();
