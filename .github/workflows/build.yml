@@ -21,3 +21,6 @@ jobs:
 
       - name: Run tests
         run: mvn -B test
+        env:
+          GITBOOK_ACCESS_TOKEN: ${{ secrets.GITBOOK_ACCESS_TOKEN }}
+          GITBOOK_COMPONENTS_SPACE_ID: ${{ secrets.GITBOOK_COMPONENTS_SPACE_ID }}
