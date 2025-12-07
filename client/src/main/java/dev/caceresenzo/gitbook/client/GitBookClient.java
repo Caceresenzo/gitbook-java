@@ -80,6 +80,9 @@ public interface GitBookClient {
 		/** The page size used for pagination. */
 		private int maxPageSize = DEFAULT_MAX_PAGE_SIZE;
 
+		/** Print HTTP exchanges in {@link System#err}. Can leak the Access Token! */
+		private boolean trace = false;
+
 		public Builder unauthenticated() {
 			return accessToken(null);
 		}
@@ -93,7 +96,8 @@ public interface GitBookClient {
 			return new GitBookClientImpl(
 				apiUrl,
 				accessToken,
-				maxPageSize
+				maxPageSize,
+				trace
 			);
 		}
 

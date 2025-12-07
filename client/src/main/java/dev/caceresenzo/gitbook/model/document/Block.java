@@ -11,18 +11,40 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 public sealed interface Block extends Node {
 
 	List<Node> getChildren();
 
-	final class Code extends SimpleBlock implements Block {}
+	@Data
+	@EqualsAndHashCode(callSuper = true)
+	final class Code extends SimpleBlock implements Block {
+
+		@JsonProperty("data.syntax")
+		private String syntax;
+
+		@JsonProperty("data.lineNumbers")
+		private boolean lineNumbers;
+
+		@JsonProperty("data.title")
+		private String title;
+
+		// @JsonProperty("data.overflow")
+		// private String overflow;
+
+		@JsonProperty("data.expandable")
+		private boolean expandable;
+
+	}
 
 	final class CodeLine extends SimpleBlock implements Block {}
 
 	final class Columns extends SimpleBlock implements Block {}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Column extends SimpleBlock implements Block {
 
 		@JsonProperty("data.verticalAlignment")
@@ -45,6 +67,8 @@ public sealed interface Block extends Node {
 
 	final class Divider extends SimpleBlock implements Block {}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Drawing extends SimpleBlock implements Block {
 
 		@JsonProperty("data.ref")
@@ -55,6 +79,8 @@ public sealed interface Block extends Node {
 
 	}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Embed extends SimpleBlock implements Block {
 
 		@JsonProperty("data.url")
@@ -65,6 +91,8 @@ public sealed interface Block extends Node {
 
 	}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Expandable extends SimpleBlock implements Block {
 
 		@JsonProperty("fragment.expandable-title")
@@ -81,6 +109,8 @@ public sealed interface Block extends Node {
 
 	final class Heading3 extends SimpleHeading implements Block {}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Hint extends SimpleHeading implements Block {
 
 		@JsonProperty("data.style")
@@ -108,7 +138,6 @@ public sealed interface Block extends Node {
 
 	@Data
 	@EqualsAndHashCode(callSuper = true)
-	@ToString(callSuper = true)
 	final class Image extends SimpleBlock implements Block {
 
 		@JsonProperty("data.alt")
@@ -122,6 +151,8 @@ public sealed interface Block extends Node {
 
 	}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class ListItem extends SimpleBlock implements Block {
 
 		@JsonProperty("data.checked")
@@ -129,6 +160,8 @@ public sealed interface Block extends Node {
 
 	}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Math extends SimpleBlock implements Block {
 
 		@JsonProperty("data.formula")
@@ -138,6 +171,8 @@ public sealed interface Block extends Node {
 
 	final class OrderedList extends SimpleBlock implements Block {}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class PageLink extends SimpleBlock implements Block {
 
 		@JsonProperty("data.ref")
@@ -155,7 +190,6 @@ public sealed interface Block extends Node {
 
 	@Data
 	@EqualsAndHashCode(callSuper = true)
-	@ToString(callSuper = true)
 	final class Table extends SimpleBlock implements Block {
 
 		@JsonProperty("records")
@@ -167,6 +201,8 @@ public sealed interface Block extends Node {
 
 	final class Tabs extends SimpleBlock implements Block {}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Tab extends SimpleBlock implements Block {
 
 		@JsonProperty("meta.id")
@@ -179,6 +215,8 @@ public sealed interface Block extends Node {
 
 	final class Updates extends SimpleBlock implements Block {}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
 	final class Update extends SimpleBlock implements Block {
 
 		@JsonProperty("data.date")
@@ -190,7 +228,6 @@ public sealed interface Block extends Node {
 
 	@Data
 	@EqualsAndHashCode(callSuper = true)
-	@ToString(callSuper = true)
 	final class Other extends SimpleBlock implements Block {
 
 		@JsonProperty("type")
@@ -199,6 +236,11 @@ public sealed interface Block extends Node {
 		@JsonAnySetter
 		@JsonAnyGetter
 		private Map<String, Object> properties;
+
+		@Override
+		public String toString() {
+			return "%s(key=\"%s\", type=%s, children=%s)".formatted(getClass().getSimpleName(), getKey(), type, getChildren());
+		}
 
 	}
 
@@ -220,6 +262,8 @@ class SimpleBlock {
 
 }
 
+@Getter
+@Setter
 class SimpleHeading extends SimpleBlock {
 
 	@JsonProperty("meta.id")

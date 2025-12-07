@@ -32,7 +32,8 @@ public class GitBookClientImpl implements GitBookClient {
 	public GitBookClientImpl(
 		String apiUrl,
 		String accessToken,
-		int maxPageSize
+		int maxPageSize,
+		boolean trace
 	) {
 		Objects.requireNonNull(apiUrl, "apiUrl must be specified");
 
@@ -45,12 +46,17 @@ public class GitBookClientImpl implements GitBookClient {
 		final var feignBuilder = Feign.builder()
 			.encoder(new JacksonEncoder(mapper))
 			.decoder(new JacksonDecoder(mapper))
-			.logLevel(feign.Logger.Level.FULL)
-			.logger(new feign.Logger.ErrorLogger())
 			.errorDecoder(new FeignGitBookErrorDecoder(mapper));
 
 		if (accessToken != null) {
-			feignBuilder.requestInterceptor(new AuthRequestInterceptor(accessToken));
+			feignBuilder
+				.requestInterceptor(new AuthRequestInterceptor(accessToken));
+		}
+
+		if (trace) {
+			feignBuilder
+				.logLevel(feign.Logger.Level.FULL)
+				.logger(new feign.Logger.ErrorLogger());
 		}
 
 		this.maxPageSize = maxPageSize;
