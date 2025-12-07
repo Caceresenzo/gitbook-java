@@ -43,7 +43,7 @@ import lombok.Setter;
 	@JsonSubTypes.Type(value = Block.Table.class, name = "table"),
 	@JsonSubTypes.Type(value = Block.TaskList.class, name = "list-tasks"),
 	@JsonSubTypes.Type(value = Block.Tabs.class, name = "tabs"),
-	@JsonSubTypes.Type(value = Block.TabItem.class, name = "tabs-item"),
+	@JsonSubTypes.Type(value = Block.TabsItem.class, name = "tabs-item"),
 	@JsonSubTypes.Type(value = Block.Updates.class, name = "updates"),
 	@JsonSubTypes.Type(value = Block.Update.class, name = "update"),
 	@JsonSubTypes.Type(value = Block.UnorderedList.class, name = "list-unordered"),
@@ -106,7 +106,7 @@ public sealed interface Block extends Node {
 	final class Drawing extends SimpleBlock implements Block {
 
 		@JsonProperty("data.ref")
-		private Reference reference;
+		private Reference source;
 
 		@JsonProperty("fragment.caption")
 		private Fragment caption;
@@ -128,6 +128,9 @@ public sealed interface Block extends Node {
 	@Data
 	@EqualsAndHashCode(callSuper = true)
 	final class Expandable extends SimpleBlock implements Block {
+
+		@JsonProperty("meta.id")
+		private String id;
 
 		@JsonProperty("fragment.expandable-title")
 		private Fragment title;
@@ -178,7 +181,10 @@ public sealed interface Block extends Node {
 		private String alt;
 
 		@JsonProperty("data.ref")
-		private Reference reference;
+		private Reference source;
+
+		@JsonProperty("data.width")
+		private Integer width;
 
 		@JsonProperty("fragment.caption")
 		private Fragment caption;
@@ -210,7 +216,7 @@ public sealed interface Block extends Node {
 	final class PageLink extends SimpleBlock implements Block {
 
 		@JsonProperty("data.ref")
-		private Reference.Page pageReference;
+		private Reference.Page target;
 
 	}
 
@@ -237,7 +243,7 @@ public sealed interface Block extends Node {
 
 	@Data
 	@EqualsAndHashCode(callSuper = true)
-	final class TabItem extends SimpleBlock implements Block {
+	final class TabsItem extends SimpleBlock implements Block {
 
 		@JsonProperty("meta.id")
 		private String id;
