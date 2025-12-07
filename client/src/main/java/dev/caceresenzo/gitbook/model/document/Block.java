@@ -8,12 +8,46 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, defaultImpl = Block.Other.class)
+@JsonSubTypes({
+	@JsonSubTypes.Type(value = Block.Code.class, name = "code"),
+	@JsonSubTypes.Type(value = Block.CodeLine.class, name = "code-line"),
+	@JsonSubTypes.Type(value = Block.Columns.class, name = "columns"),
+	@JsonSubTypes.Type(value = Block.Column.class, name = "column"),
+	@JsonSubTypes.Type(value = Block.Divider.class, name = "divider"),
+	@JsonSubTypes.Type(value = Block.Drawing.class, name = "drawing"),
+	@JsonSubTypes.Type(value = Block.Embed.class, name = "embed"),
+	@JsonSubTypes.Type(value = Block.Expandable.class, name = "expandable"),
+	@JsonSubTypes.Type(value = Block.Heading1.class, name = "heading-1"),
+	@JsonSubTypes.Type(value = Block.Heading2.class, name = "heading-2"),
+	@JsonSubTypes.Type(value = Block.Heading3.class, name = "heading-3"),
+	@JsonSubTypes.Type(value = Block.Hint.class, name = "hint"),
+	@JsonSubTypes.Type(value = Block.Images.class, name = "images"),
+	@JsonSubTypes.Type(value = Block.Image.class, name = "image"),
+	@JsonSubTypes.Type(value = Block.ListItem.class, name = "list-item"),
+	@JsonSubTypes.Type(value = Block.Math.class, name = "math"),
+	@JsonSubTypes.Type(value = Block.OrderedList.class, name = "list-ordered"),
+	@JsonSubTypes.Type(value = Block.PageLink.class, name = "content-ref"),
+	@JsonSubTypes.Type(value = Block.Paragraph.class, name = "paragraph"),
+	@JsonSubTypes.Type(value = Block.Quote.class, name = "blockquote"),
+	@JsonSubTypes.Type(value = Block.Stepper.class, name = "stepper"),
+	@JsonSubTypes.Type(value = Block.StepperStep.class, name = "stepper-step"),
+	@JsonSubTypes.Type(value = Block.Table.class, name = "table"),
+	@JsonSubTypes.Type(value = Block.TaskList.class, name = "list-tasks"),
+	@JsonSubTypes.Type(value = Block.Tabs.class, name = "tabs"),
+	@JsonSubTypes.Type(value = Block.TabItem.class, name = "tabs-item"),
+	@JsonSubTypes.Type(value = Block.Updates.class, name = "updates"),
+	@JsonSubTypes.Type(value = Block.Update.class, name = "update"),
+	@JsonSubTypes.Type(value = Block.UnorderedList.class, name = "list-unordered"),
+})
 public sealed interface Block extends Node {
 
 	List<Node> getChildren();
@@ -203,7 +237,7 @@ public sealed interface Block extends Node {
 
 	@Data
 	@EqualsAndHashCode(callSuper = true)
-	final class Tab extends SimpleBlock implements Block {
+	final class TabItem extends SimpleBlock implements Block {
 
 		@JsonProperty("meta.id")
 		private String id;

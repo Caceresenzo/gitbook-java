@@ -20,49 +20,50 @@ import dev.caceresenzo.gitbook.model.document.Text;
 @SuppressWarnings("serial")
 public class NodeDelegatingDeserializer extends DelegatingDeserializer {
 
-	public static final String DISCRIMINATOR = "$class";
-
 	private static final Map<String, Class<? extends Node>> TYPES = new HashMap<>();
-	private static final Map<String, Class<? extends Node>> FALLBACKS = new HashMap<>();
 
 	static {
-		TYPES.put("block:heading-1", Block.Heading1.class);
-		TYPES.put("block:heading-2", Block.Heading2.class);
-		TYPES.put("block:heading-3", Block.Heading3.class);
-		TYPES.put("block:paragraph", Block.Paragraph.class);
-		TYPES.put("block:list-item", Block.ListItem.class);
-		TYPES.put("block:list-ordered", Block.OrderedList.class);
-		TYPES.put("block:list-unordered", Block.UnorderedList.class);
-		TYPES.put("block:table", Block.Table.class);
-		TYPES.put("block:code", Block.Code.class);
-		TYPES.put("block:code-line", Block.CodeLine.class);
-		TYPES.put("block:images", Block.Images.class);
-		TYPES.put("block:image", Block.Image.class);
-		TYPES.put("block:divider", Block.Divider.class);
-		TYPES.put("block:embed", Block.Embed.class);
-		TYPES.put("block:hint", Block.Hint.class);
-		TYPES.put("block:math", Block.Math.class);
-		TYPES.put("block:expandable", Block.Expandable.class);
-		TYPES.put("block:list-tasks", Block.TaskList.class);
-		TYPES.put("block:blockquote", Block.Quote.class);
-		TYPES.put("block:tabs", Block.Tabs.class);
-		TYPES.put("block:tabs-item", Block.Tab.class);
-		TYPES.put("block:stepper", Block.Stepper.class);
-		TYPES.put("block:stepper-step", Block.StepperStep.class);
-		TYPES.put("block:updates", Block.Updates.class);
-		TYPES.put("block:update", Block.Update.class);
-		TYPES.put("block:drawing", Block.Drawing.class);
-		TYPES.put("block:content-ref", Block.PageLink.class);
-		TYPES.put("block:columns", Block.Columns.class);
-		TYPES.put("block:column", Block.Column.class);
-		FALLBACKS.put("block", Block.Other.class);
+		TYPES.put("block", Block.class);
+		TYPES.put("inline", Inline.class);
+		TYPES.put("text", Text.class);
 
-		TYPES.put("text:", Text.class);
-
-		TYPES.put("inline:annotation", Inline.Annotation.class);
-		TYPES.put("inline:link", Inline.Link.class);
-		TYPES.put("inline:mention", Inline.Mention.class);
-		TYPES.put("inline:inline-math", Inline.Math.class);
+		//		TYPES.put("block:heading-1", Block.Heading1.class);
+		//		TYPES.put("block:heading-2", Block.Heading2.class);
+		//		TYPES.put("block:heading-3", Block.Heading3.class);
+		//		TYPES.put("block:paragraph", Block.Paragraph.class);
+		//		TYPES.put("block:list-item", Block.ListItem.class);
+		//		TYPES.put("block:list-ordered", Block.OrderedList.class);
+		//		TYPES.put("block:list-unordered", Block.UnorderedList.class);
+		//		TYPES.put("block:table", Block.Table.class);
+		//		TYPES.put("block:code", Block.Code.class);
+		//		TYPES.put("block:code-line", Block.CodeLine.class);
+		//		TYPES.put("block:images", Block.Images.class);
+		//		TYPES.put("block:image", Block.Image.class);
+		//		TYPES.put("block:divider", Block.Divider.class);
+		//		TYPES.put("block:embed", Block.Embed.class);
+		//		TYPES.put("block:hint", Block.Hint.class);
+		//		TYPES.put("block:math", Block.Math.class);
+		//		TYPES.put("block:expandable", Block.Expandable.class);
+		//		TYPES.put("block:list-tasks", Block.TaskList.class);
+		//		TYPES.put("block:blockquote", Block.Quote.class);
+		//		TYPES.put("block:tabs", Block.Tabs.class);
+		//		TYPES.put("block:tabs-item", Block.Tab.class);
+		//		TYPES.put("block:stepper", Block.Stepper.class);
+		//		TYPES.put("block:stepper-step", Block.StepperStep.class);
+		//		TYPES.put("block:updates", Block.Updates.class);
+		//		TYPES.put("block:update", Block.Update.class);
+		//		TYPES.put("block:drawing", Block.Drawing.class);
+		//		TYPES.put("block:content-ref", Block.PageLink.class);
+		//		TYPES.put("block:columns", Block.Columns.class);
+		//		TYPES.put("block:column", Block.Column.class);
+		//		FALLBACKS.put("block", Block.Other.class);
+		//
+		//		TYPES.put("text:", Text.class);
+		//
+		//		TYPES.put("inline:annotation", Inline.Annotation.class);
+		//		TYPES.put("inline:link", Inline.Link.class);
+		//		TYPES.put("inline:mention", Inline.Mention.class);
+		//		TYPES.put("inline:inline-math", Inline.Math.class);
 		//		TYPES.put("block:images", Inline.Other.class);
 		//		TYPES.put("inline:inline-image", Inline.Other.class);
 	}
@@ -83,20 +84,11 @@ public class NodeDelegatingDeserializer extends DelegatingDeserializer {
 		final var root = codec.<ObjectNode>readTree(parser);
 
 		final var object = root.remove("object") instanceof TextNode textNode ? textNode.asText() : "";
-		final var type = root.remove("type") instanceof TextNode textNode ? textNode.asText() : "";
-		final var discriminator = "%s:%s".formatted(object, type);
 
-		root.put("key", root.get("key").asText() + "  " + discriminator);
-
-		var clazz = TYPES.get(discriminator);
+		var clazz = TYPES.get(object);
 		if (clazz == null) {
-			System.err.println(root);
-			throw new UnsupportedOperationException(discriminator);
-			//			clazz = Node.Other.class;
-			//			root.put("type", discriminator);
+			throw new UnsupportedOperationException("unknown object type: %s".formatted(object));
 		}
-
-		//		System.out.println(root);
 
 		parser = codec.treeAsTokens(root);
 		parser.nextToken();

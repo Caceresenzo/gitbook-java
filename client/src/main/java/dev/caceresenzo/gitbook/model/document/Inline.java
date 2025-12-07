@@ -1,12 +1,24 @@
 package dev.caceresenzo.gitbook.model.document;
 
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, defaultImpl = Inline.Other.class)
+@JsonSubTypes({
+	@JsonSubTypes.Type(value = Inline.Annotation.class, name = "annotation"),
+	@JsonSubTypes.Type(value = Inline.Link.class, name = "link"),
+	@JsonSubTypes.Type(value = Inline.Mention.class, name = "mention"),
+	@JsonSubTypes.Type(value = Inline.Math.class, name = "math"),
+})
 public sealed interface Inline extends Node {
 
 	List<Node> getChildren();
@@ -47,6 +59,24 @@ public sealed interface Inline extends Node {
 
 	}
 
+	@Data
+	@EqualsAndHashCode(callSuper = true)
+	final class Other extends SimpleInline implements Inline {
+
+		@JsonProperty("type")
+		private String type;
+
+		@JsonAnySetter
+		@JsonAnyGetter
+		private Map<String, Object> properties;
+
+		@Override
+		public String toString() {
+			return "%s(key=\"%s\", type=%s, children=%s)".formatted(getClass().getSimpleName(), getKey(), type, getChildren());
+		}
+
+	}
+
 }
 
 @Data
@@ -60,7 +90,7 @@ class SimpleInline {
 
 	@Override
 	public String toString() {
-		return "%s(key=\"%s\")".formatted(getClass().getSimpleName(), key);
+		return "%s(key=\"%s\", children=%s)".formatted(getClass().getSimpleName(), key, children);
 	}
 
 }
