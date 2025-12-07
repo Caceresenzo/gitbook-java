@@ -218,7 +218,7 @@ public class NodeTest {
 			final var lines = code.getChildren();
 			assertThat(lines).hasSize(1);
 
-			final var line = assertInstanceOf(Block.CodeLine.class, lines.getFirst());
+			final var line = assertInstanceOf(Block.CodeLine.class, lines.get(0));
 			assertSingleTextContent("print(42)", line);
 		}
 
@@ -235,7 +235,7 @@ public class NodeTest {
 			final var lines = code.getChildren();
 			assertThat(lines).hasSize(1);
 
-			final var line = assertInstanceOf(Block.CodeLine.class, lines.getFirst());
+			final var line = assertInstanceOf(Block.CodeLine.class, lines.get(0));
 			assertSingleTextContent("print(42)", line);
 		}
 	}
@@ -244,7 +244,7 @@ public class NodeTest {
 		final var children = block.getChildren();
 		assertThat(children).hasSize(1);
 
-		final var paragraph = assertInstanceOf(Paragraph.class, children.getFirst());
+		final var paragraph = assertInstanceOf(Paragraph.class, children.get(0));
 
 		assertSingleTextContent(expected, paragraph);
 	}
@@ -253,12 +253,12 @@ public class NodeTest {
 		final var children = block.getChildren();
 		assertThat(children).hasSize(1);
 
-		final var text = assertInstanceOf(Text.class, children.getFirst());
+		final var text = assertInstanceOf(Text.class, children.get(0));
 
 		final var leaves = text.getLeaves();
 		assertThat(leaves).hasSize(1);
 
-		final var leaf = leaves.getFirst();
+		final var leaf = leaves.get(0);
 		assertEquals(expected, leaf.getText());
 	}
 
