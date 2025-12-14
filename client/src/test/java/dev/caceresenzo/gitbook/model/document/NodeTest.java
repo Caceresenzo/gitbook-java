@@ -448,6 +448,47 @@ public class NodeTest {
 			}
 		}
 
+		@Order(80)
+		@DisplayName("Update")
+		@Test
+		void testUpdates() {
+			final var nodes = getNodes("/advanced/update");
+			assertThat(nodes).hasSize(1);
+
+			final var root = assertInstanceOf(Block.Updates.class, nodes.get(0));
+
+			final var updates = root.getChildren();
+			assertThat(updates).hasSize(2);
+
+			{
+				final var update = assertInstanceOf(Block.Update.class, updates.get(0));
+
+				final var children = update.getChildren();
+				assertThat(children).hasSize(2);
+
+				final var title = assertInstanceOf(Block.Heading1.class, children.get(0));
+				assertEquals("first-update", title.getId());
+				assertContainsSingleTextContent("First Update", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, children.get(1));
+				assertContainsSingleTextContent("First Update Content", content);
+			}
+
+			{
+				final var update = assertInstanceOf(Block.Update.class, updates.get(1));
+
+				final var children = update.getChildren();
+				assertThat(children).hasSize(2);
+
+				final var title = assertInstanceOf(Block.Heading1.class, children.get(0));
+				assertEquals("second-update", title.getId());
+				assertContainsSingleTextContent("Second Update", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, children.get(1));
+				assertContainsSingleTextContent("Second Update Content", content);
+			}
+		}
+
 	}
 
 	private List<Node> getNodes(String page) {
