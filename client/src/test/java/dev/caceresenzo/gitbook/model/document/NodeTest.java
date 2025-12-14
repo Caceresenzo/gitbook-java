@@ -393,6 +393,61 @@ public class NodeTest {
 			}
 		}
 
+		@Order(70)
+		@DisplayName("Stepper")
+		@Test
+		void testStepper() {
+			final var nodes = getNodes("/advanced/stepper");
+			assertThat(nodes).hasSize(1);
+
+			final var root = assertInstanceOf(Block.Stepper.class, nodes.get(0));
+
+			final var steps = root.getChildren();
+			assertThat(steps).hasSize(3);
+
+			{
+				final var step = assertInstanceOf(Block.StepperStep.class, steps.get(0));
+
+				final var children = step.getChildren();
+				assertThat(children).hasSize(2);
+
+				final var title = assertInstanceOf(Block.Heading2.class, children.get(0));
+				assertEquals("first-step", title.getId());
+				assertContainsSingleTextContent("First Step", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, children.get(1));
+				assertContainsSingleTextContent("First Step Content", content);
+			}
+
+			{
+				final var step = assertInstanceOf(Block.StepperStep.class, steps.get(1));
+
+				final var children = step.getChildren();
+				assertThat(children).hasSize(2);
+
+				final var title = assertInstanceOf(Block.Heading2.class, children.get(0));
+				assertEquals("second-step", title.getId());
+				assertContainsSingleTextContent("Second Step", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, children.get(1));
+				assertContainsSingleTextContent("Second Step Content", content);
+			}
+
+			{
+				final var step = assertInstanceOf(Block.StepperStep.class, steps.get(2));
+
+				final var children = step.getChildren();
+				assertThat(children).hasSize(2);
+
+				final var title = assertInstanceOf(Block.Heading2.class, children.get(0));
+				assertEquals("third-step", title.getId());
+				assertContainsSingleTextContent("Third Step", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, children.get(1));
+				assertContainsSingleTextContent("Third Step Content", content);
+			}
+		}
+
 	}
 
 	private List<Node> getNodes(String page) {
