@@ -20,28 +20,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import dev.caceresenzo.gitbook.client.GitBookClient;
+import dev.caceresenzo.gitbook.BaseGitBookTest;
 import dev.caceresenzo.gitbook.model.document.Block.Paragraph;
 
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
-public class NodeTest {
+public class NodeTest extends BaseGitBookTest {
 
-	public static final String ACCESS_TOKEN_ENV_VAR = "GITBOOK_ACCESS_TOKEN";
 	public static final String SPACE_ID_ENV_VAR = "GITBOOK_COMPONENTS_SPACE_ID";
 	public static final String LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
 
-	static GitBookClient client;
 	static String spaceId;
 
 	@BeforeAll
 	static void setUp() {
-		final var accessToken = assertEnvironmentVariable(ACCESS_TOKEN_ENV_VAR);
 		spaceId = assertEnvironmentVariable(SPACE_ID_ENV_VAR);
-
-		client = GitBookClient.builder()
-			.accessToken(accessToken)
-			.trace(true)
-			.build();
 	}
 
 	@Nested
@@ -554,15 +546,6 @@ public class NodeTest {
 
 		final var leaf = leaves.get(0);
 		assertEquals(expected, leaf.getText());
-	}
-
-	private static String assertEnvironmentVariable(String name) {
-		String value = System.getenv(name);
-		if (value == null || value.isBlank()) {
-			throw new IllegalStateException("%s is not set".formatted(name));
-		}
-
-		return value;
 	}
 
 }
