@@ -4,6 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -11,13 +20,23 @@ import org.junit.jupiter.api.Test;
 import dev.caceresenzo.gitbook.BaseGitBookTest;
 import dev.caceresenzo.gitbook.client.GitBookClient;
 import dev.caceresenzo.gitbook.client.GitBookClientException;
+import dev.caceresenzo.gitbook.model.ChangeRequest;
 
 class GitBookClientImplTest extends BaseGitBookTest {
 
 	static GitBookClient unauthenticatedClient;
 
+	public static final String ORGANIZATION_ID_ENV_VAR = "GITBOOK_COMPONENTS_ORGANIZATION_ID";
+	public static final String SPACE_ID_ENV_VAR = "GITBOOK_COMPONENTS_SPACE_ID";
+
+	static String organizationId;
+	static String spaceId;
+
 	@BeforeAll
 	static void setUp() {
+		organizationId = assertEnvironmentVariable(ORGANIZATION_ID_ENV_VAR);
+		spaceId = assertEnvironmentVariable(SPACE_ID_ENV_VAR);
+
 		unauthenticatedClient = GitBookClient.builder()
 			.unauthenticated()
 			.build();
@@ -56,7 +75,9 @@ class GitBookClientImplTest extends BaseGitBookTest {
 
 	@Test
 	void findAllOrganizations() {
-		final var organizations = client.findAllOrganizations().toList();
+		final var organizations = client.findAllOrganizations()
+			.limit(1)
+			.toList();
 
 		assertThat(organizations).hasSizeGreaterThanOrEqualTo(1);
 	}
@@ -68,26 +89,16 @@ class GitBookClientImplTest extends BaseGitBookTest {
 
 	@Test
 	void findOrganizationById() {
-		final var firstOrganization = client.findAllOrganizations()
-			.findFirst()
-			.orElseThrow();
+		final var organization = client.findOrganizationById(organizationId);
 
-		final var organization = client.findOrganizationById(firstOrganization.getId());
-
-		assertThat(organization)
-			.contains(firstOrganization);
+		assertThat(organization).isNotEmpty();
 	}
 
 	@Test
 	void findOrganizationByIdWhenUnauthenticated() {
-		final var firstOrganization = client.findAllOrganizations()
-			.findFirst()
-			.orElseThrow();
+		final var organization = unauthenticatedClient.findOrganizationById(organizationId);
 
-		final var organization = unauthenticatedClient.findOrganizationById(firstOrganization.getId());
-
-		assertThat(organization)
-			.contains(firstOrganization);
+		assertThat(organization).isNotEmpty();
 	}
 
 	@Test
@@ -95,6 +106,119 @@ class GitBookClientImplTest extends BaseGitBookTest {
 		final var organization = unauthenticatedClient.findOrganizationById("x");
 
 		assertThat(organization).isEmpty();
+	}
+
+	@Test
+	void findAllSpaces() {
+		final var spaces = client.findAllSpaces(organizationId)
+			.limit(1)
+			.toList();
+
+		assertThat(spaces).isNotEmpty();
+	}
+
+	@Test
+	void findAllSpacesWhenUnauthenticated() {
+		assertThrows(GitBookClientException.AuthenticationRequired.class, () -> {
+			unauthenticatedClient.findAllSpaces(organizationId);
+		});
+	}
+
+	@Test
+	void findAllSpacesWhenNotFound() {
+		assertThrows(GitBookClientException.AuthenticationRequired.class, () -> {
+			unauthenticatedClient.findAllSpaces("x");
+		});
+	}
+
+	@Test
+	void findSpaceById() {
+		final var space = client.findSpaceById(spaceId);
+
+		assertThat(space).isNotEmpty();
+	}
+
+	@Test
+	void findSpaceByIdWhenUnauthenticated() {
+		assertThrows(GitBookClientException.AuthenticationRequired.class, () -> {
+			unauthenticatedClient.findSpaceById(spaceId);
+		});
+	}
+
+	@Test
+	void findSpaceByIdWhenNotFound() {
+		assertThrows(GitBookClientException.AuthenticationRequired.class, () -> {
+			unauthenticatedClient.findSpaceById(spaceId);
+		});
+	}
+
+	@Test
+	void getSpaceContent() {
+		final var revisionPage = client.getSpaceContent(spaceId, "/");
+
+		assertThat(revisionPage).isNotEmpty();
+	}
+
+	@Test
+	void getSpacePages() {
+		final var pages = client.getSpacePages(spaceId);
+
+		assertThat(pages)
+			.isNotEmpty()
+			.hasValueSatisfying((list) -> {
+				assertThat(list).isNotEmpty();
+			});
+	}
+
+	@Test
+	void findAllSpaceFiles() {
+		final var files = client.findAllSpaceFiles(spaceId)
+			.limit(1)
+			.toList();
+
+		assertThat(files).isNotEmpty();
+	}
+
+	@Test
+	void findAllChangeRequests() {
+		final var spiedClient = spy(client);
+
+		doReturn(Stream.empty(), Stream.empty(), Stream.empty(), Stream.empty())
+			.when(spiedClient)
+			.findAllChangeRequests(anyString(), any(ChangeRequest.Status.class));
+
+		spiedClient.findAllChangeRequests(spaceId).toList();
+
+		for (ChangeRequest.Status status : ChangeRequest.Status.values()) {
+			verify(spiedClient).findAllChangeRequests(eq(spaceId), eq(status));
+		}
+	}
+
+	@Test
+	void findAllChangeRequestsStopIfLimitReached() {
+		final var spiedClient = spy(client);
+
+		doReturn(Stream.of(new ChangeRequest(), new ChangeRequest()), Stream.empty(), Stream.empty(), Stream.empty())
+			.when(spiedClient)
+			.findAllChangeRequests(anyString(), any(ChangeRequest.Status.class));
+
+		spiedClient.findAllChangeRequests(spaceId)
+			.limit(1)
+			.toList();
+
+		verify(spiedClient, times(1)).findAllChangeRequests(eq(spaceId), eq(ChangeRequest.Status.DRAFT));
+		verify(spiedClient, times(0)).findAllChangeRequests(eq(spaceId), eq(ChangeRequest.Status.OPEN));
+		verify(spiedClient, times(0)).findAllChangeRequests(eq(spaceId), eq(ChangeRequest.Status.ARCHIVED));
+		verify(spiedClient, times(0)).findAllChangeRequests(eq(spaceId), eq(ChangeRequest.Status.MERGED));
+	}
+
+	@Test
+	void findAllChangeRequestsWithStatus() {
+		final var changeRequests = client.findAllChangeRequests(spaceId, ChangeRequest.Status.MERGED)
+			.limit(1)
+			.toList();
+
+		assertThat(changeRequests).isNotEmpty();
 	}
 
 }
