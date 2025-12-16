@@ -449,7 +449,7 @@ public class NodeTest {
 		}
 
 		@Order(80)
-		@DisplayName("Update")
+		@DisplayName("Updates")
 		@Test
 		void testUpdates() {
 			final var nodes = getNodes("/advanced/update");
@@ -487,6 +487,22 @@ public class NodeTest {
 				final var content = assertInstanceOf(Block.Paragraph.class, children.get(1));
 				assertContainsSingleTextContent("Second Update Content", content);
 			}
+		}
+
+		@Order(90)
+		@DisplayName("Drawing")
+		@Test
+		void testDrawing() {
+			final var nodes = getNodes("/advanced/drawing");
+			assertThat(nodes).hasSize(1);
+
+			final var drawing = assertInstanceOf(Block.Drawing.class, nodes.get(0));
+			assertInstanceOf(Reference.File.class, drawing.getSource());
+			assertThat(drawing.getChildren()).isEmpty();
+
+			final var caption = drawing.getCaption();
+			assertNotNull(caption);
+			assertIsSingleParagraphWithTextContent("A caption.", caption.getNodes());
 		}
 
 	}
