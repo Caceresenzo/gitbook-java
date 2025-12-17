@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import dev.caceresenzo.gitbook.BaseGitBookTest;
@@ -28,14 +29,17 @@ class GitBookClientImplTest extends BaseGitBookTest {
 
 	public static final String ORGANIZATION_ID_ENV_VAR = "GITBOOK_COMPONENTS_ORGANIZATION_ID";
 	public static final String SPACE_ID_ENV_VAR = "GITBOOK_COMPONENTS_SPACE_ID";
+	public static final String CHANGE_REQUEST_ID_ENV_VAR = "GITBOOK_COMPONENTS_CHANGE_REQUEST_ID";
 
 	static String organizationId;
 	static String spaceId;
+	static String changeRequestId;
 
 	@BeforeAll
 	static void setUp() {
 		organizationId = assertEnvironmentVariable(ORGANIZATION_ID_ENV_VAR);
 		spaceId = assertEnvironmentVariable(SPACE_ID_ENV_VAR);
+		changeRequestId = assertEnvironmentVariable(CHANGE_REQUEST_ID_ENV_VAR);
 
 		unauthenticatedClient = GitBookClient.builder()
 			.unauthenticated()
@@ -219,6 +223,63 @@ class GitBookClientImplTest extends BaseGitBookTest {
 			.toList();
 
 		assertThat(changeRequests).isNotEmpty();
+	}
+
+	@Test
+	void findChangeRequestById() {
+		final var changeRequest = client.findChangeRequestById(spaceId, changeRequestId);
+
+		assertThat(changeRequest).isNotEmpty();
+	}
+
+	@Test
+	void findChangeRequestByIdWhenNotFound() {
+		final var changeRequest = client.findChangeRequestById(spaceId, "x");
+
+		assertThat(changeRequest).isEmpty();
+	}
+
+	@Test
+	void findChangeRequestByNumber() {
+		final var changeRequestReference = client.findChangeRequestById(spaceId, changeRequestId).orElseThrow();
+		final var changeRequest = client.findChangeRequestByNumber(spaceId, changeRequestReference.getNumber());
+
+		assertThat(changeRequest).isNotEmpty();
+	}
+
+	@Test
+	void findChangeRequestByNumberWhenNotFound() {
+		final var changeRequest = client.findChangeRequestByNumber(spaceId, 99999);
+
+		assertThat(changeRequest).isEmpty();
+	}
+
+	@Test
+	void getChangeRequestContent() {
+		final var revisionPage = client.getChangeRequestContent(spaceId, changeRequestId, "/");
+
+		assertThat(revisionPage).isNotEmpty();
+	}
+
+	@Test
+	void getChangeRequestPages() {
+		final var pages = client.getChangeRequestPages(spaceId, changeRequestId);
+
+		assertThat(pages)
+			.isNotEmpty()
+			.hasValueSatisfying((list) -> {
+				assertThat(list).isNotEmpty();
+			});
+	}
+
+	@Test
+	@Disabled("currently no change request with files")
+	void findAllChangeRequestFiles() {
+		final var files = client.findAllChangeRequestFiles(spaceId, changeRequestId)
+			.limit(1)
+			.toList();
+
+		assertThat(files).isNotEmpty();
 	}
 
 }

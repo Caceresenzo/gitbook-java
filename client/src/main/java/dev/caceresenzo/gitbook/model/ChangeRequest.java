@@ -16,7 +16,7 @@ public class ChangeRequest {
 	private String subject;
 
 	@JsonProperty("number")
-	private long number;
+	private int number;
 
 	@JsonProperty("status")
 	private Status status;
