@@ -21,6 +21,7 @@ import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import dev.caceresenzo.gitbook.BaseGitBookTest;
+import dev.caceresenzo.gitbook.model.Page;
 import dev.caceresenzo.gitbook.model.document.Block.Paragraph;
 
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
@@ -507,6 +508,47 @@ public class NodeTest extends BaseGitBookTest {
 			final var math = assertInstanceOf(Block.Math.class, nodes.get(0));
 			assertEquals("f(x) = x * e^{2 pi i \\xi x}", math.getFormula());
 			assertThat(math.getChildren()).isEmpty();
+		}
+
+		@Order(110)
+		@DisplayName("PageLink")
+		@Test
+		void testPageLink() {
+			final var nodes = getNodes("/advanced/page-link");
+			assertThat(nodes).hasSize(2);
+
+			final var pages = client.getSpacePages(spaceId)
+				.orElseThrow();
+
+			{
+				final var textPageId = pages.stream()
+					.filter((page) -> page instanceof Page.Group group && "Simple".equalsIgnoreCase(group.getTitle()))
+					.map(Page.Group.class::cast)
+					.findFirst().orElseThrow()
+					.getChildren().stream()
+					.filter((page) -> "Text".equalsIgnoreCase(page.getTitle()))
+					.findFirst().orElseThrow()
+					.getId();
+
+				final var pageLink = assertInstanceOf(Block.PageLink.class, nodes.get(0));
+				assertEquals(textPageId, pageLink.getTarget().id());
+				assertThat(pageLink.getChildren()).isEmpty();
+			}
+
+			{
+				final var imagePageId = pages.stream()
+					.filter((page) -> page instanceof Page.Group group && "Advanced".equalsIgnoreCase(group.getTitle()))
+					.map(Page.Group.class::cast)
+					.findFirst().orElseThrow()
+					.getChildren().stream()
+					.filter((page) -> "Image".equalsIgnoreCase(page.getTitle()))
+					.findFirst().orElseThrow()
+					.getId();
+
+				final var pageLink = assertInstanceOf(Block.PageLink.class, nodes.get(1));
+				assertEquals(imagePageId, pageLink.getTarget().id());
+				assertThat(pageLink.getChildren()).isEmpty();
+			}
 		}
 
 	}
