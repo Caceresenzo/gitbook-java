@@ -22,7 +22,7 @@ public class GitBookAutoConfiguration {
 	GitBookClient gitBookClient(GitBookProperties properties) throws IOException {
 		log.info("Configuring GitBook Client");
 
-		final GitBookClient.Builder builder = GitBookClient.builder()
+		final var builder = GitBookClient.builder()
 			.accessToken(properties.getAccessToken());
 
 		final var apiUrl = properties.getApiUrl();
