@@ -497,6 +497,18 @@ public class NodeTest extends BaseGitBookTest {
 			assertIsSingleParagraphWithTextContent("A caption.", caption.getNodes());
 		}
 
+		@Order(100)
+		@DisplayName("Math")
+		@Test
+		void testMath() {
+			final var nodes = getNodes("/advanced/math");
+			assertThat(nodes).hasSize(1);
+
+			final var math = assertInstanceOf(Block.Math.class, nodes.get(0));
+			assertEquals("f(x) = x * e^{2 pi i \\xi x}", math.getFormula());
+			assertThat(math.getChildren()).isEmpty();
+		}
+
 	}
 
 	private List<Node> getNodes(String page) {
