@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestClassOrder;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import dev.caceresenzo.gitbook.BaseGitBookTest;
@@ -41,7 +44,7 @@ public class NodeTest extends BaseGitBookTest {
 	@Order(10)
 	@DisplayName("Simple")
 	@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-	class Simple {
+	class SimpleGroup {
 
 		@Order(10)
 		@DisplayName("Text")
@@ -251,7 +254,7 @@ public class NodeTest extends BaseGitBookTest {
 	@Order(20)
 	@DisplayName("Advanced")
 	@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-	class Advanced {
+	class AdvancedGroup {
 
 		@Order(10)
 		@DisplayName("Image")
@@ -584,6 +587,334 @@ public class NodeTest extends BaseGitBookTest {
 
 	}
 
+	@Nested
+	@Order(30)
+	@DisplayName("Inline")
+	@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+	class InlineGroup {
+
+		@Nested
+		@Order(10)
+		@DisplayName("Simple")
+		@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+		@TestInstance(Lifecycle.PER_CLASS)
+		class SimpleGroup {
+
+			List<Node> nodes;
+
+			@BeforeAll
+			void setUp() {
+				nodes = getNodes("/inline/simple");
+			}
+
+			@Order(10)
+			@DisplayName("Bold")
+			@Test
+			void testBold() {
+				doTest(
+					0, "Bold",
+					1, "Lorem ",
+					"ipsum dolor sit amet", new Mark.Bold(),
+					", consectetur adipiscing elit."
+				);
+			}
+
+			@Order(20)
+			@DisplayName("Italic")
+			@Test
+			void testItalic() {
+				doTest(
+					2, "Italic",
+					3, "Lorem ",
+					"ipsum dolor sit amet", new Mark.Italic(),
+					", consectetur adipiscing elit."
+				);
+
+			}
+
+			@Order(30)
+			@DisplayName("Strikethrough")
+			@Test
+			void testStrikethrough() {
+				doTest(
+					4, "Strikethrough",
+					5, "Lorem ",
+					"ipsum dolor sit amet", new Mark.Strikethrough(),
+					", consectetur adipiscing elit."
+				);
+			}
+
+			@Order(40)
+			@DisplayName("Superscript")
+			@Test
+			void testSuperscript() {
+				doTest(
+					6, "Superscript",
+					7, "Lorem ",
+					"ipsum dolor sit amet", new Mark.Superscript(),
+					", consectetur adipiscing elit."
+				);
+			}
+
+			@Order(50)
+			@DisplayName("Subscript")
+			@Test
+			void testSubscript() {
+				doTest(
+					8, "Subscript",
+					9, "Lorem ",
+					"ipsum dolor sit amet", new Mark.Subscript(),
+					", consectetur adipiscing elit."
+				);
+			}
+
+			@Order(60)
+			@DisplayName("Code")
+			@Test
+			void testCode() {
+				doTest(
+					10, "Code",
+					11, "Lorem ",
+					"ipsum dolor sit amet", new Mark.Code(),
+					", consectetur adipiscing elit."
+				);
+			}
+
+			@Order(70)
+			@DisplayName("Keyboard")
+			@Test
+			void testKeyboard() {
+				doTest(
+					12, "Keyboard",
+					13, "Lorem ",
+					"ipsum dolor sit amet", new Mark.Keyboard(),
+					", consectetur adipiscing elit."
+				);
+			}
+
+			@Order(80)
+			@DisplayName("Link")
+			@Test
+			void testLink() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(14));
+				assertContainsSingleTextContent("Link", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(15));
+
+				final var children = content.getChildren();
+				assertThat(children).hasSize(3);
+
+				final var prefix = assertInstanceOf(Text.class, children.get(0));
+				assertThat(prefix.getLeaves()).containsExactly(leaf("Lorem "));
+
+				final var text = assertInstanceOf(Inline.Link.class, children.get(1));
+				assertContainsSingleTextContent("ipsum dolor sit amet", text);
+				assertEquals(new Reference.Url("http://www.monip.org/"), text.getReference());
+
+				final var suffix = assertInstanceOf(Text.class, children.get(2));
+				assertThat(suffix.getLeaves()).containsExactly(leaf(", consectetur adipiscing elit."));
+			}
+
+			@Order(90)
+			@DisplayName("Annotate")
+			@Test
+			void testAnnotate() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(16));
+				assertContainsSingleTextContent("Annotate", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(17));
+
+				final var children = content.getChildren();
+				assertThat(children).hasSize(3);
+
+				final var prefix = assertInstanceOf(Text.class, children.get(0));
+				assertThat(prefix.getLeaves()).containsExactly(leaf("Lorem "));
+
+				final var text = assertInstanceOf(Inline.Annotation.class, children.get(1));
+				assertContainsSingleTextContent("ipsum dolor sit amet", text);
+
+				final var body = text.getBody();
+				assertNotNull(body);
+				assertIsSingleParagraphWithTextContent("Hello World!", body.getNodes());
+
+				final var suffix = assertInstanceOf(Text.class, children.get(2));
+				assertThat(suffix.getLeaves()).containsExactly(leaf(", consectetur adipiscing elit."));
+			}
+
+			@Order(100)
+			@DisplayName("Color")
+			@Test
+			void testColor() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(18));
+				assertContainsSingleTextContent("Color", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(19));
+				final var text = assertInstanceOf(Text.class, content.getChildren().get(0));
+				assertThat(text.getLeaves())
+					.containsExactly(
+						leaf("Lorem "),
+						leaf("ipsum dolor sit amet", new Mark.Color("default", "$success")),
+						leaf(", "),
+						leaf("consectetur adipiscing elit", new Mark.Color("purple", "default")),
+						leaf(".")
+					);
+			}
+
+			@Order(110)
+			@DisplayName("Math")
+			@Test
+			void testMath() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(20));
+				assertContainsSingleTextContent("Math", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(21));
+
+				final var text = assertInstanceOf(Text.class, content.getChildren().get(0));
+				assertThat(text.getLeaves())
+					.containsExactly(
+						leaf("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ")
+					);
+
+				final var math = assertInstanceOf(Inline.Math.class, content.getChildren().get(1));
+				assertEquals("f(x) = x * e^{2 pi i \\xi x}", math.getFormula());
+				assertThat(math.getChildren()).isEmpty();
+
+				final var suffix = assertInstanceOf(Text.class, content.getChildren().get(2));
+				assertThat(suffix.getLeaves())
+					.containsExactly(
+						leaf("")
+					);
+			}
+
+			@Order(120)
+			@DisplayName("Button")
+			@Test
+			void testButton() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(22));
+				assertContainsSingleTextContent("Button", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(23));
+
+				final var text = assertInstanceOf(Text.class, content.getChildren().get(0));
+				assertThat(text.getLeaves())
+					.containsExactly(
+						leaf("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ")
+					);
+
+				final var button = assertInstanceOf(Inline.Button.class, content.getChildren().get(1));
+				assertNotNull(button.getReference());
+				assertEquals("A button", button.getLabel());
+				assertEquals(Inline.Button.Kind.PRIMARY, button.getKind());
+				assertEquals("1", button.getIcon());
+
+				final var suffix = assertInstanceOf(Text.class, content.getChildren().get(2));
+				assertThat(suffix.getLeaves())
+					.containsExactly(
+						leaf("")
+					);
+			}
+
+			@Order(130)
+			@DisplayName("Emoji")
+			@Test
+			void testEmoji() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(24));
+				assertContainsSingleTextContent("Emoji", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(25));
+
+				final var text = assertInstanceOf(Text.class, content.getChildren().get(0));
+				assertThat(text.getLeaves())
+					.containsExactly(
+						leaf("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ")
+					);
+
+				final var emoji = assertInstanceOf(Inline.Emoji.class, content.getChildren().get(1));
+				assertEquals("1f44d", emoji.getCode());
+
+				final var suffix = assertInstanceOf(Text.class, content.getChildren().get(2));
+				assertThat(suffix.getLeaves())
+					.containsExactly(
+						leaf("")
+					);
+			}
+
+			@Order(140)
+			@DisplayName("Icon")
+			@Test
+			void testIcon() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(26));
+				assertContainsSingleTextContent("Icon", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(27));
+
+				final var text = assertInstanceOf(Text.class, content.getChildren().get(0));
+				assertThat(text.getLeaves())
+					.containsExactly(
+						leaf("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ")
+					);
+
+				final var icon = assertInstanceOf(Inline.Icon.class, content.getChildren().get(1));
+				assertEquals("trash-plus", icon.getIcon());
+
+				final var suffix = assertInstanceOf(Text.class, content.getChildren().get(2));
+				assertThat(suffix.getLeaves())
+					.containsExactly(
+						leaf("")
+					);
+			}
+
+			@Order(150)
+			@DisplayName("Image")
+			@Test
+			void testImage() {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(28));
+				assertContainsSingleTextContent("Inline Image", title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(29));
+
+				final var text = assertInstanceOf(Text.class, content.getChildren().get(0));
+				assertThat(text.getLeaves())
+					.containsExactly(
+						leaf("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ")
+					);
+
+				final var image = assertInstanceOf(Inline.Image.class, content.getChildren().get(1));
+				assertEquals("An alt text.", image.getAlt());
+				assertInstanceOf(Reference.Url.class, image.getSource());
+				assertNotNull(image.getSize());
+
+				final var suffix = assertInstanceOf(Text.class, content.getChildren().get(2));
+				assertThat(suffix.getLeaves())
+					.containsExactly(
+						leaf("")
+					);
+			}
+
+			private Leaf leaf(String text, Mark... marks) {
+				return new Leaf()
+					.setText(text)
+					.setMarks(Arrays.asList(marks));
+			}
+
+			private void doTest(int titleIndex, String titleContent, int contentIndex, String prefixContent, String textContent, Mark mark, String suffixContent) {
+				final var title = assertInstanceOf(Block.Heading1.class, nodes.get(titleIndex));
+				assertContainsSingleTextContent(titleContent, title);
+
+				final var content = assertInstanceOf(Block.Paragraph.class, nodes.get(contentIndex));
+				final var text = assertInstanceOf(Text.class, content.getChildren().get(0));
+				assertThat(text.getLeaves())
+					.containsExactly(
+						leaf(prefixContent),
+						leaf(textContent, mark),
+						leaf(suffixContent)
+					);
+			}
+
+		}
+
+	}
+
 	private List<Node> getNodes(String page) {
 		var revisionPage = client.getSpaceContent(spaceId, page)
 			.orElseThrow(() -> new IllegalStateException("%s not found in space %s".formatted(page, spaceId)));
@@ -608,16 +939,15 @@ public class NodeTest extends BaseGitBookTest {
 		assertContainsSingleTextContent(expected, paragraph);
 	}
 
-	private static void assertIsSingleTextContent(String expected, List<Node> nodes) {
-		assertThat(nodes).hasSize(1);
-
-		final var text = assertInstanceOf(Text.class, nodes.get(0));
-
-		assertTextContent(expected, text);
+	private static void assertContainsSingleTextContent(String expected, Block block) {
+		assertContainsSingleTextContent(expected, block.getChildren());
 	}
 
-	private static void assertContainsSingleTextContent(String expected, Block block) {
-		final var children = block.getChildren();
+	private static void assertContainsSingleTextContent(String expected, Inline inline) {
+		assertContainsSingleTextContent(expected, inline.getChildren());
+	}
+
+	private static void assertContainsSingleTextContent(String expected, List<Node> children) {
 		assertThat(children).hasSize(1);
 
 		final var text = assertInstanceOf(Text.class, children.get(0));

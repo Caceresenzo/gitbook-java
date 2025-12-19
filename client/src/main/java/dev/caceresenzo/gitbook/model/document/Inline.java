@@ -17,7 +17,11 @@ import lombok.EqualsAndHashCode;
 	@JsonSubTypes.Type(value = Inline.Annotation.class, name = "annotation"),
 	@JsonSubTypes.Type(value = Inline.Link.class, name = "link"),
 	@JsonSubTypes.Type(value = Inline.Mention.class, name = "mention"),
-	@JsonSubTypes.Type(value = Inline.Math.class, name = "math"),
+	@JsonSubTypes.Type(value = Inline.Math.class, name = "inline-math"),
+	@JsonSubTypes.Type(value = Inline.Button.class, name = "button"),
+	@JsonSubTypes.Type(value = Inline.Emoji.class, name = "emoji"),
+	@JsonSubTypes.Type(value = Inline.Icon.class, name = "icon"),
+	@JsonSubTypes.Type(value = Inline.Image.class, name = "inline-image"),
 })
 public sealed interface Inline extends Node {
 
@@ -36,7 +40,7 @@ public sealed interface Inline extends Node {
 	@EqualsAndHashCode(callSuper = true)
 	final class Link extends SimpleInline implements Inline {
 
-		@JsonProperty("ref")
+		@JsonProperty("data.ref")
 		private Reference reference;
 
 	}
@@ -45,7 +49,7 @@ public sealed interface Inline extends Node {
 	@EqualsAndHashCode(callSuper = true)
 	final class Mention extends SimpleInline implements Inline {
 
-		@JsonProperty("ref")
+		@JsonProperty("data.ref")
 		private Reference reference;
 
 	}
@@ -56,6 +60,66 @@ public sealed interface Inline extends Node {
 
 		@JsonProperty("data.formula")
 		private String formula;
+
+	}
+
+	@Data
+	@EqualsAndHashCode(callSuper = true)
+	final class Button extends SimpleInline implements Inline {
+
+		@JsonProperty("data.ref")
+		private Reference reference;
+
+		@JsonProperty("data.label")
+		private String label;
+
+		@JsonProperty("data.kind")
+		private Kind kind;
+
+		@JsonProperty("data.icon")
+		private String icon;
+
+		public enum Kind {
+
+			@JsonProperty("primary")
+			PRIMARY,
+
+			@JsonProperty("secondary")
+			SECONDARY;
+		}
+
+	}
+
+	@Data
+	@EqualsAndHashCode(callSuper = true)
+	final class Emoji extends SimpleInline implements Inline {
+
+		@JsonProperty("data.code")
+		private String code;
+
+	}
+
+	@Data
+	@EqualsAndHashCode(callSuper = true)
+	final class Icon extends SimpleInline implements Inline {
+
+		@JsonProperty("data.icon")
+		private String icon;
+
+	}
+
+	@Data
+	@EqualsAndHashCode(callSuper = true)
+	final class Image extends SimpleInline implements Inline {
+
+		@JsonProperty("data.alt")
+		private String alt;
+
+		@JsonProperty("data.ref")
+		private Reference source;
+
+		@JsonProperty("data.size")
+		private String size;
 
 	}
 
