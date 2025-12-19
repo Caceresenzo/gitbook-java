@@ -551,6 +551,37 @@ public class NodeTest extends BaseGitBookTest {
 			}
 		}
 
+		@Order(120)
+		@DisplayName("Column")
+		@Test
+		void testColumn() {
+			final var nodes = getNodes("/advanced/column");
+			assertThat(nodes).hasSize(1);
+
+			final var root = assertInstanceOf(Block.Columns.class, nodes.get(0));
+
+			final var columns = root.getChildren();
+			assertThat(columns).hasSize(2);
+
+			{
+				final var column = assertInstanceOf(Block.Column.class, columns.get(0));
+				assertContainsSingleParagraphWithTextContent("Hello World", column);
+			}
+
+			{
+				final var column = assertInstanceOf(Block.Column.class, columns.get(1));
+
+				final var children = column.getChildren();
+				assertThat(children).hasSize(1);
+
+				final var hint = assertInstanceOf(Block.Hint.class, children.get(0));
+				assertEquals(Block.Hint.Style.INFO, hint.getStyle());
+
+				final var hintChildren = hint.getChildren();
+				assertIsSingleParagraphWithTextContent("From another column", hintChildren);
+			}
+		}
+
 	}
 
 	private List<Node> getNodes(String page) {
