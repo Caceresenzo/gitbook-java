@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 import dev.caceresenzo.gitbook.model.document.Block;
 import dev.caceresenzo.gitbook.model.document.Fragment;
+import lombok.Getter;
 
 @SuppressWarnings("serial")
 public class TableBlockDeserializer extends DelegatingDeserializer {
@@ -53,10 +54,10 @@ public class TableBlockDeserializer extends DelegatingDeserializer {
 
 		final var data = codec.treeToValue(root.remove("data"), Data.class);
 
-		final var columnDefinitions = new ArrayList<>(data.getDefinition().values());
-		columnDefinitions.sort(Comparator.comparingInt((definition) -> data.view.getColumns().indexOf(definition.getId())));
+		final var columnDefinitions = new ArrayList<>(data.definition.values());
+		columnDefinitions.sort(Comparator.comparingInt((definition) -> data.view.columns.indexOf(definition.getId())));
 
-		final var rows = data.getRecords().values()
+		final var rows = data.records.values()
 			.stream()
 			.sorted(Comparator.comparing(Data.RecordEntry::getOrderIndex))
 			.map((recordEntry) -> {
@@ -88,7 +89,6 @@ public class TableBlockDeserializer extends DelegatingDeserializer {
 		return table;
 	}
 
-	@lombok.Data
 	public static class Data {
 
 		@JsonProperty
@@ -100,18 +100,17 @@ public class TableBlockDeserializer extends DelegatingDeserializer {
 		@JsonProperty
 		public View view;
 
-		@lombok.Data
 		public static class RecordEntry {
 
 			@JsonProperty
 			public Map<String, Object> values;
 
+			@Getter
 			@JsonProperty
 			public String orderIndex;
 
 		}
 
-		@lombok.Data
 		public static class View {
 
 			@JsonProperty
