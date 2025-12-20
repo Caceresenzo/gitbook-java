@@ -312,9 +312,56 @@ public class NodeTest extends BaseGitBookTest {
 		@Test
 		void testTable() {
 			final var nodes = getNodes("/advanced/table");
-			assertThat(nodes).hasSize(1);
+			assertThat(nodes).hasSize(4);
 
-			// TODO
+			{
+				assertInstanceOf(Block.Heading1.class, nodes.get(0));
+
+				final var table = assertInstanceOf(Block.Table.class, nodes.get(1));
+
+				final var columnDefinitions = table.getColumnDefinitions();
+				assertThat(columnDefinitions)
+					.hasSize(3)
+					.satisfiesExactly(
+						(definition) -> {
+							assertEquals("Header 1", definition.getTitle());
+							assertEquals(Block.Table.ColumnDefinition.TextAlignment.LEFT, definition.getTextAlignment());
+						},
+						(definition) -> {
+							assertEquals("Header 2", definition.getTitle());
+							assertEquals(Block.Table.ColumnDefinition.TextAlignment.CENTER, definition.getTextAlignment());
+						},
+						(definition) -> {
+							assertEquals("Header 3", definition.getTitle());
+							assertEquals(Block.Table.ColumnDefinition.TextAlignment.RIGHT, definition.getTextAlignment());
+						}
+					);
+
+				final var left = columnDefinitions.get(0);
+				final var middle = columnDefinitions.get(1);
+				final var right = columnDefinitions.get(2);
+
+				final var rows = table.getRows();
+				assertThat(rows)
+					.hasSize(3)
+					.satisfiesExactly(
+						(row) -> {
+							assertIsSingleParagraphWithTextContent("Line 1, 1", row.getCell(left).getNodes());
+							assertIsSingleParagraphWithTextContent("Line 1, 2", row.getCell(middle).getNodes());
+							assertIsSingleParagraphWithTextContent("Line 1, 3", row.getCell(right).getNodes());
+						},
+						(row) -> {
+							assertIsSingleParagraphWithTextContent("Line 2, 1", row.getCell(left).getNodes());
+							assertIsSingleParagraphWithTextContent("Line 2, 2", row.getCell(middle).getNodes());
+							assertIsSingleParagraphWithTextContent("Line 2, 3", row.getCell(right).getNodes());
+						},
+						(row) -> {
+							assertIsSingleParagraphWithTextContent("Line 3, 1", row.getCell(left).getNodes());
+							assertIsSingleParagraphWithTextContent("Line 3, 2", row.getCell(middle).getNodes());
+							assertIsSingleParagraphWithTextContent("Line 3, 3", row.getCell(right).getNodes());
+						}
+					);
+			}
 		}
 
 		@Order(40)

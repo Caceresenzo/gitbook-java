@@ -232,8 +232,55 @@ public sealed interface Block extends Node {
 	@EqualsAndHashCode(callSuper = true)
 	final class Table extends SimpleBlock implements Block {
 
-		@JsonProperty("records")
-		private Map<String, Object> records;
+		private boolean hideHeader;
+
+		private List<ColumnDefinition> columnDefinitions;
+		private List<Row> rows;
+
+		@Data
+		public static class ColumnDefinition {
+
+			@JsonProperty("id")
+			private String id;
+
+			@JsonProperty("title")
+			private String title;
+
+			@JsonProperty("type")
+			private String type;
+
+			@JsonProperty("textAlignment")
+			private TextAlignment textAlignment;
+
+			public enum TextAlignment {
+
+				@JsonProperty("left")
+				LEFT,
+
+				@JsonProperty("center")
+				CENTER,
+
+				@JsonProperty("right")
+				RIGHT,
+
+			}
+
+		}
+
+		@Data
+		public static class Row {
+
+			private Map<String, Fragment> cells;
+
+			public Fragment getCell(ColumnDefinition columnDefinition) {
+				return cells.get(columnDefinition.getId());
+			}
+
+			public Fragment getCell(String columnDefinitionId) {
+				return cells.get(columnDefinitionId);
+			}
+
+		}
 
 	}
 

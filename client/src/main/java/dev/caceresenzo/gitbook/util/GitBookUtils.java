@@ -16,6 +16,8 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import dev.caceresenzo.gitbook.client.impl.serial.DataDelegatingDeserializer;
 import dev.caceresenzo.gitbook.client.impl.serial.NodeDelegatingDeserializer;
+import dev.caceresenzo.gitbook.client.impl.serial.TableBlockDeserializer;
+import dev.caceresenzo.gitbook.model.document.Block;
 import dev.caceresenzo.gitbook.model.document.Mark;
 import dev.caceresenzo.gitbook.model.document.Node;
 import lombok.SneakyThrows;
@@ -56,9 +58,13 @@ public class GitBookUtils {
 				) {
 					//					System.out.println("GitBookUtils.NodeModule.setupModule(...).new BeanDeserializerModifier() {...}.modifyDeserializer()  " + beanDesc.getBeanClass());
 
-					if (Node.class.equals(beanDesc.getBeanClass()) || Mark.class.equals(beanDesc.getBeanClass())) {
+					final var beanClass = beanDesc.getBeanClass();
+
+					if (Node.class.equals(beanClass) || Mark.class.equals(beanClass)) {
 						deserializer = new NodeDelegatingDeserializer(deserializer);
-					} else if (Node.class.isAssignableFrom(beanDesc.getBeanClass()) || Mark.class.isAssignableFrom(beanDesc.getBeanClass())) {
+					} else if (Block.Table.class.equals(beanClass)) {
+						deserializer = new TableBlockDeserializer(deserializer);
+					} else if (Node.class.isAssignableFrom(beanClass) || Mark.class.isAssignableFrom(beanClass)) {
 						deserializer = new DataDelegatingDeserializer(deserializer);
 					}
 
