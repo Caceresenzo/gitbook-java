@@ -60,7 +60,7 @@ public class TableBlockDeserializer extends DelegatingDeserializer {
 			.stream()
 			.sorted(Comparator.comparing(Data.RecordEntry::getOrderIndex))
 			.map((recordEntry) -> {
-				final var cells = HashMap.<String, Fragment>newHashMap(recordEntry.values.size());
+				final var cells = new HashMap<String, Fragment>(recordEntry.values.size());
 
 				for (final var entry : recordEntry.values.entrySet()) {
 					final var columnId = entry.getKey();
