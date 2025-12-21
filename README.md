@@ -36,7 +36,7 @@ This Java client connects with GitBook.com, enabling simple interaction with the
 
 ```xml
 <properties>
-	<gitbook.version>0.0.0</gitbook.version>
+	<gitbook.version>0.1.0</gitbook.version>
 </properties>
 
 <dependencies>
