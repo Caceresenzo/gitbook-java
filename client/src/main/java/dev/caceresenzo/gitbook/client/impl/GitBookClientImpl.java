@@ -167,7 +167,11 @@ public class GitBookClientImpl implements GitBookClient {
 			return Stream.empty();
 		}
 
-		return asStream((pageSize, nextCursor) -> delegate.getSpaceFiles(spaceId, pageSize, nextCursor));
+		try {
+			return asStream((pageSize, nextCursor) -> delegate.getSpaceFiles(spaceId, pageSize, nextCursor));
+		} catch (GitBookClientException.SpaceNotFound __) {
+			return Stream.empty();
+		}
 	}
 
 	@Override
@@ -182,7 +186,11 @@ public class GitBookClientImpl implements GitBookClient {
 			return Stream.empty();
 		}
 
-		return asStream((pageSize, nextCursor) -> delegate.getChangeRequests(spaceId, status, pageSize, nextCursor));
+		try {
+			return asStream((pageSize, nextCursor) -> delegate.getChangeRequests(spaceId, status, pageSize, nextCursor));
+		} catch (GitBookClientException.SpaceNotFound __) {
+			return Stream.empty();
+		}
 	}
 
 	@Override
@@ -240,7 +248,11 @@ public class GitBookClientImpl implements GitBookClient {
 			return Stream.empty();
 		}
 
-		return asStream((pageSize, nextCursor) -> delegate.getChangeRequestFiles(spaceId, changeRequestId, pageSize, nextCursor));
+		try {
+			return asStream((pageSize, nextCursor) -> delegate.getChangeRequestFiles(spaceId, changeRequestId, pageSize, nextCursor));
+		} catch (GitBookClientException.SpaceNotFound | GitBookClientException.ChangeRequestNotFound __) {
+			return Stream.empty();
+		}
 	}
 
 	private boolean isBlank(String value) {

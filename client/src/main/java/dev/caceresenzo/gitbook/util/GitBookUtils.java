@@ -42,36 +42,36 @@ public class GitBookUtils {
 	}
 
 	@SuppressWarnings("serial")
-	public class NodeModule extends SimpleModule {
+	public static class NodeModule extends SimpleModule {
 
 		@Override
 		public void setupModule(SetupContext context) {
 			super.setupModule(context);
 
-			context.addBeanDeserializerModifier(new BeanDeserializerModifier() {
+			context.addBeanDeserializerModifier(new CustomDeserializerInstaller());
+		}
 
-				@Override
-				public JsonDeserializer<?> modifyDeserializer(
-					DeserializationConfig config,
-					BeanDescription beanDesc,
-					JsonDeserializer<?> deserializer
-				) {
-					//					System.out.println("GitBookUtils.NodeModule.setupModule(...).new BeanDeserializerModifier() {...}.modifyDeserializer()  " + beanDesc.getBeanClass());
+		public static class CustomDeserializerInstaller extends BeanDeserializerModifier {
 
-					final var beanClass = beanDesc.getBeanClass();
+			@Override
+			public JsonDeserializer<?> modifyDeserializer(
+				DeserializationConfig config,
+				BeanDescription beanDesc,
+				JsonDeserializer<?> deserializer
+			) {
+				final var beanClass = beanDesc.getBeanClass();
 
-					if (Node.class.equals(beanClass) || Mark.class.equals(beanClass)) {
-						deserializer = new NodeDelegatingDeserializer(deserializer);
-					} else if (Block.Table.class.equals(beanClass)) {
-						deserializer = new TableBlockDeserializer(deserializer);
-					} else if (Node.class.isAssignableFrom(beanClass) || Mark.class.isAssignableFrom(beanClass)) {
-						deserializer = new DataDelegatingDeserializer(deserializer);
-					}
-
-					return deserializer;
+				if (Node.class.equals(beanClass) || Mark.class.equals(beanClass)) {
+					deserializer = new NodeDelegatingDeserializer(deserializer);
+				} else if (Block.Table.class.equals(beanClass)) {
+					deserializer = new TableBlockDeserializer(deserializer);
+				} else if (Node.class.isAssignableFrom(beanClass) || Mark.class.isAssignableFrom(beanClass)) {
+					deserializer = new DataDelegatingDeserializer(deserializer);
 				}
 
-			});
+				return deserializer;
+			}
+
 		}
 
 	}

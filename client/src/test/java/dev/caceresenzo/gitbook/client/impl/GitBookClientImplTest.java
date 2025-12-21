@@ -184,6 +184,15 @@ class GitBookClientImplTest extends BaseGitBookTest {
 	}
 
 	@Test
+	void findAllSpaceFilesWhenNotFound() {
+		final var files = client.findAllSpaceFiles("x")
+			.limit(1)
+			.toList();
+
+		assertThat(files).isEmpty();
+	}
+
+	@Test
 	void findAllChangeRequests() {
 		final var spiedClient = spy(client);
 
@@ -223,6 +232,15 @@ class GitBookClientImplTest extends BaseGitBookTest {
 			.toList();
 
 		assertThat(changeRequests).isNotEmpty();
+	}
+
+	@Test
+	void findAllChangeRequestsWithStatusWhenNotFound() {
+		final var changeRequests = client.findAllChangeRequests("x", ChangeRequest.Status.MERGED)
+			.limit(1)
+			.toList();
+
+		assertThat(changeRequests).isEmpty();
 	}
 
 	@Test
