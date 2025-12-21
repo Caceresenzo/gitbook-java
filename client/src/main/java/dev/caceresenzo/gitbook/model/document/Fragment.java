@@ -18,4 +18,8 @@ public class Fragment {
 	@JsonProperty("fragment")
 	private final String name;
 
+	public boolean hasNodes() {
+		return nodes != null && !nodes.isEmpty();
+	}
+
 }

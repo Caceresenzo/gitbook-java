@@ -52,6 +52,11 @@ public sealed interface Block extends Node {
 
 	List<Node> getChildren();
 
+	default boolean hasChildren() {
+		final var children = getChildren();
+		return children != null && !children.isEmpty();
+	}
+
 	@Data
 	@EqualsAndHashCode(callSuper = true)
 	final class Code extends SimpleBlock implements Block {

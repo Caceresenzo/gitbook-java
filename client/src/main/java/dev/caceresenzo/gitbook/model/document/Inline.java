@@ -27,6 +27,11 @@ public sealed interface Inline extends Node {
 
 	List<Node> getChildren();
 
+	default boolean hasChildren() {
+		final var children = getChildren();
+		return children != null && !children.isEmpty();
+	}
+
 	@Data
 	@EqualsAndHashCode(callSuper = true)
 	final class Annotation extends SimpleInline implements Inline {
@@ -41,7 +46,7 @@ public sealed interface Inline extends Node {
 	final class Link extends SimpleInline implements Inline {
 
 		@JsonProperty("data.ref")
-		private Reference reference;
+		private Reference target;
 
 	}
 
@@ -50,7 +55,7 @@ public sealed interface Inline extends Node {
 	final class Mention extends SimpleInline implements Inline {
 
 		@JsonProperty("data.ref")
-		private Reference reference;
+		private Reference target;
 
 	}
 
@@ -68,7 +73,7 @@ public sealed interface Inline extends Node {
 	final class Button extends SimpleInline implements Inline {
 
 		@JsonProperty("data.ref")
-		private Reference reference;
+		private Reference target;
 
 		@JsonProperty("data.label")
 		private String label;
@@ -119,7 +124,17 @@ public sealed interface Inline extends Node {
 		private Reference source;
 
 		@JsonProperty("data.size")
-		private String size;
+		private Size size;
+
+		public enum Size {
+
+			@JsonProperty("original")
+			ORIGINAL,
+
+			@JsonProperty("line")
+			LINE,
+
+		}
 
 	}
 

@@ -756,7 +756,7 @@ public class NodeTest extends BaseGitBookTest {
 
 				final var text = assertInstanceOf(Inline.Link.class, children.get(1));
 				assertContainsSingleTextContent("ipsum dolor sit amet", text);
-				assertEquals(new Reference.Url("http://www.monip.org/"), text.getReference());
+				assertEquals(new Reference.Url("http://www.monip.org/"), text.getTarget());
 
 				final var suffix = assertInstanceOf(Text.class, children.get(2));
 				assertThat(suffix.getLeaves()).containsExactly(leaf(", consectetur adipiscing elit."));
@@ -849,7 +849,7 @@ public class NodeTest extends BaseGitBookTest {
 					);
 
 				final var button = assertInstanceOf(Inline.Button.class, content.getChildren().get(1));
-				assertNotNull(button.getReference());
+				assertNotNull(button.getTarget());
 				assertEquals("A button", button.getLabel());
 				assertEquals(Inline.Button.Kind.PRIMARY, button.getKind());
 				assertEquals("1", button.getIcon());
