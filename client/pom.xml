@@ -9,7 +9,7 @@
 		<version>latest</version>
 	</parent>
 
-	<artifactId>gitbook-client</artifactId>
+	<artifactId>client</artifactId>
 	<name>gitbook-client</name>
 
 	<properties>

@@ -9,7 +9,7 @@
 		<version>latest</version>
 	</parent>
 
-	<artifactId>gitbook-spring-boot-starter</artifactId>
+	<artifactId>spring-boot-starter</artifactId>
 	<name>gitbook-spring-boot-starter</name>
 
 	<properties>
