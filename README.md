@@ -11,13 +11,23 @@ This Java client connects with GitBook.com, enabling simple interaction with the
       - [Get API Informations](#get-api-informations)
     - [User](#user)
       - [Find the Currently Authenticated User](#find-the-currently-authenticated-user)
-      - [Find a User by an ID](#find-a-user-by-an-id)
+      - [Find a User by ID](#find-a-user-by-id)
     - [Organization](#organization)
       - [Stream Organizations](#stream-organizations)
-      - [Find an Organization by an ID](#find-an-organization-by-an-id)
+      - [Find an Organization by ID](#find-an-organization-by-id)
     - [Space](#space)
       - [Stream Spaces](#stream-spaces)
-      - [Find a Space by an ID](#find-a-space-by-an-id)
+      - [Find a Space by ID](#find-a-space-by-id)
+      - [Get a Space Content page by path](#get-a-space-content-page-by-path)
+      - [List all Space Pages](#list-all-space-pages)
+      - [Stream Space Files](#stream-space-files)
+    - [Change Requests](#change-requests)
+      - [Stream Change Requests](#stream-change-requests)
+      - [Find a Change Requests by ID](#find-a-change-requests-by-id)
+      - [Find a Change Requests by Space Number](#find-a-change-requests-by-space-number)
+      - [Get a Change Request Content page by path](#get-a-change-request-content-page-by-path)
+      - [List all Change Request Pages](#list-all-change-request-pages)
+      - [Stream Change Request Files](#stream-change-request-files)
 - [Spring Boot Starter](#spring-boot-starter)
   - [Client](#client-1)
 
@@ -72,10 +82,11 @@ The user will not be found if the access token is missing or invalid.
 Optional<User> user = client.findCurrentUser();
 ```
 
-#### Find a User by an ID
+#### Find a User by ID
 
 ```java
-Optional<User> user = client.findUserById("a0b1c2d3e4f5g6h7i8j9k0l1m2n3");
+String userId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<User> user = client.findUserById(userId);
 ```
 
 ### Organization
@@ -89,10 +100,11 @@ Stream<Organization> organizations = client.findAllOrganizations();
 List<Organization> organizations = client.findAllOrganizations().toList();
 ```
 
-#### Find an Organization by an ID
+#### Find an Organization by ID
 
 ```java
-Optional<Organization> organization = client.findOrganization("a0b1c2d3e4f5g6h7i8j9k0l1m2n3");
+String organizationId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<Organization> organization = client.findOrganization(organizationId);
 ```
 
 ### Space
@@ -107,10 +119,96 @@ Stream<Space> spaces = client.findAllSpaces(organizationId);
 List<Space> spaces = client.findAllSpaces(organizationId).toList();
 ```
 
-#### Find a Space by an ID
+#### Find a Space by ID
 
 ```java
-Optional<Space> space = client.findSpace("a0b1c2d3e4f5g6h7i8j9k0l1m2n3");
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<Space> space = client.findSpace(spaceId);
+```
+
+#### Get a Space Content page by path
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String pagePath = "/hello";
+Optional<RevisionPage> content = client.getSpaceContent(spaceId, pagePath);
+```
+
+#### List all Space Pages
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<List<Page>> content = client.getSpacePages(spaceId);
+```
+
+#### Stream Space Files
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Stream<File> files = client.findAllSpaceFiles(spaceId);
+
+/* or get a list via */
+List<File> files = client.findAllSpaceFiles(spaceId).toList();
+```
+
+### Change Requests
+
+#### Stream Change Requests
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Stream<ChangeRequest> changeRequests = client.findAllChangeRequests(spaceId);
+
+/* or get a list via */
+List<ChangeRequest> changeRequests = client.findAllChangeRequests(spaceId).toList();
+
+/* or only filter by status */
+Stream<ChangeRequest> archivedChangeRequests = client.findAllChangeRequests(spaceId, ChangeRequest.Status.ARCHIVED);
+List<ChangeRequest> archivedChangeRequests = client.findAllChangeRequests(spaceId, ChangeRequest.Status.ARCHIVED).toList();
+```
+
+#### Find a Change Requests by ID
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String changeRequestId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<ChangeRequest> changeRequest = client.findChangeRequestById(spaceId, changeRequestId);
+```
+
+#### Find a Change Requests by Space Number
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String changeRequestNumber = 42;
+Optional<ChangeRequest> changeRequest = client.findChangeRequestByNumber(spaceId, changeRequestNumber);
+```
+
+#### Get a Change Request Content page by path
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String changeRequestId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String pagePath = "/hello";
+Optional<RevisionPage> content = client.getChangeRequestContent(spaceId, changeRequestId, pagePath);
+```
+
+#### List all Change Request Pages
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String changeRequestId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<List<Page>> pages = client.getChangeRequestPages(spaceId, changeRequestId);
+```
+
+#### Stream Change Request Files
+
+```java
+String spaceId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String changeRequestId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Stream<File> files = client.findAllChangeRequestFiles(spaceId, changeRequestId);
+
+/* or get a list via */
+List<File> files = client.findAllChangeRequestFiles(spaceId, changeRequestId).toList();
 ```
 
 # Spring Boot Starter
