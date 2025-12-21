@@ -19,7 +19,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>dev.caceresenzo.gitbook</groupId>
-			<artifactId>gitbook-client</artifactId>
+			<artifactId>client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
