@@ -5,45 +5,46 @@ This Java client connects with GitBook.com, enabling simple interaction with the
 - [Gitbook Client for Java](#gitbook-client-for-java)
 - [Installation](#installation)
 - [Client](#client)
-  - [Configuration](#configuration)
-  - [Usage](#usage)
-    - [API](#api)
-      - [Get API Informations](#get-api-informations)
-    - [User](#user)
-      - [Find the Currently Authenticated User](#find-the-currently-authenticated-user)
-      - [Find a User by ID](#find-a-user-by-id)
-    - [Organization](#organization)
-      - [Stream Organizations](#stream-organizations)
-      - [Find an Organization by ID](#find-an-organization-by-id)
-    - [Space](#space)
-      - [Stream Spaces](#stream-spaces)
-      - [Find a Space by ID](#find-a-space-by-id)
-      - [Get a Space Content page by path](#get-a-space-content-page-by-path)
-      - [List all Space Pages](#list-all-space-pages)
-      - [Stream Space Files](#stream-space-files)
-    - [Change Requests](#change-requests)
-      - [Stream Change Requests](#stream-change-requests)
-      - [Find a Change Requests by ID](#find-a-change-requests-by-id)
-      - [Find a Change Requests by Space Number](#find-a-change-requests-by-space-number)
-      - [Get a Change Request Content page by path](#get-a-change-request-content-page-by-path)
-      - [List all Change Request Pages](#list-all-change-request-pages)
-      - [Stream Change Request Files](#stream-change-request-files)
+	- [Configuration](#configuration)
+	- [Usage](#usage)
+		- [API](#api)
+			- [Get API Informations](#get-api-informations)
+		- [User](#user)
+			- [Find the Currently Authenticated User](#find-the-currently-authenticated-user)
+			- [Find a User by ID](#find-a-user-by-id)
+		- [Organization](#organization)
+			- [Stream Organizations](#stream-organizations)
+			- [Find an Organization by ID](#find-an-organization-by-id)
+		- [Space](#space)
+			- [Stream Spaces](#stream-spaces)
+			- [Find a Space by ID](#find-a-space-by-id)
+			- [Get a Space Content page by path](#get-a-space-content-page-by-path)
+			- [List all Space Pages](#list-all-space-pages)
+			- [Stream Space Files](#stream-space-files)
+		- [Change Requests](#change-requests)
+			- [Stream Change Requests](#stream-change-requests)
+			- [Find a Change Requests by ID](#find-a-change-requests-by-id)
+			- [Find a Change Requests by Space Number](#find-a-change-requests-by-space-number)
+			- [Get a Change Request Content page by path](#get-a-change-request-content-page-by-path)
+			- [List all Change Request Pages](#list-all-change-request-pages)
+			- [Stream Change Request Files](#stream-change-request-files)
+	- [Document Node Objects](#document-node-objects)
 - [Spring Boot Starter](#spring-boot-starter)
-  - [Client](#client-1)
+	- [Client](#client-1)
 
 # Installation
 
 ```xml
 <properties>
-    <gitbook.version>0.0.0</gitbook.version>
+	<gitbook.version>0.0.0</gitbook.version>
 </properties>
 
 <dependencies>
-    <dependency>
-        <groupId>dev.caceresenzo.gitbook</groupId>
-        <artifactId>gitbook-client</artifactId>
-        <version>${gitbook.version}</version>
-    </dependency>
+	<dependency>
+		<groupId>dev.caceresenzo.gitbook</groupId>
+		<artifactId>gitbook-client</artifactId>
+		<version>${gitbook.version}</version>
+	</dependency>
 </dependencies>
 ```
 
@@ -211,17 +212,126 @@ Stream<File> files = client.findAllChangeRequestFiles(spaceId, changeRequestId);
 List<File> files = client.findAllChangeRequestFiles(spaceId, changeRequestId).toList();
 ```
 
+## Document Node Objects
+
+All document objects have a corresponding Java class, making it easy to query information about the content.
+Most of these classes have children that can be used to traverse the tree.
+
+<details>
+<summary>Testing the block types</summary>
+
+```java
+switch (block) {
+	case Block.Code code -> {};
+	case Block.CodeLine codeLine -> { }
+
+	case Block.Columns columns -> { }
+	case Block.Column column -> { }
+
+	case Block.Divider divider -> { }
+
+	case Block.Drawing drawing -> { }
+
+	case Block.Embed embed -> { }
+
+	case Block.Expandable expandable -> { }
+
+	case Block.Heading1 heading1 -> { }
+	case Block.Heading2 heading2 -> { }
+	case Block.Heading3 heading3 -> { }
+
+	case Block.Hint hint -> { }
+
+	case Block.Images images -> { }
+	case Block.Image image -> { }
+
+	case Block.ListItem listItem -> { }
+	case Block.OrderedList orderedList -> { }
+	case Block.UnorderedList unorderedList -> { }
+	case Block.TaskList taskList -> { }
+
+	case Block.Math math -> { }
+
+	case Block.PageLink pageLink -> { }
+
+	case Block.Paragraph paragraph -> { }
+
+	case Block.Quote quote -> { }
+
+	case Block.Stepper stepper -> { }
+	case Block.StepperStep stepperStep -> { }
+
+	case Block.Table table -> { }
+
+	case Block.Tabs tabs -> { }
+	case Block.TabsItem tabsItem -> { }
+
+	case Block.Updates updates -> { }
+	case Block.Update update -> { }
+
+	/* Fallback */
+	case Block.Other other -> { }
+}
+```
+
+</details>
+
+<details>
+<summary>Testing the inline types</summary>
+
+```java
+switch (inline) {
+	case Inline.Annotation annotation -> { }
+	case Inline.Link link -> { }
+	case Inline.Mention mention -> { }
+	case Inline.Math math -> { }
+	case Inline.Button button -> { }
+	case Inline.Emoji emoji -> { }
+	case Inline.Icon icon -> { }
+	case Inline.Image image -> { }
+
+	/* Fallback */
+	case Inline.Other other -> { }
+}
+```
+
+</details>
+
+<details>
+<summary>Testing the mark types</summary>
+
+```java
+switch (mark) {
+	case Mark.Bold __ -> { }
+	case Mark.Italic __ -> { }
+	case Mark.Strikethrough __ -> { }
+
+	case Mark.Superscript __ -> { }
+	case Mark.Subscript __ -> { }
+
+	case Mark.Code __ -> { }
+	case Mark.Keyboard __ -> { }
+
+	case Mark.Color color -> { }
+
+	/* Fallback */
+	case Mark.Other __ -> { }
+}
+```
+
+</details>
+
 # Spring Boot Starter
 
 There is a Spring Boot auto-configuration available.
 
 ```xml
 <dependencies>
-    <dependency>
-        <groupId>dev.caceresenzo.gitbook</groupId>
-        <artifactId>gitbook-spring-boot-starter</artifactId>
-        <version>${gitbook.version}</version>
-    </dependency>
+	<dependency>
+		<groupId>dev.caceresenzo.gitbook</groupId>
+		<artifactId>gitbook-spring-boot-starter</artifactId>
+		<version>${gitbook.version}</version>
+	</dependency>
 </dependencies>
 ```
 
