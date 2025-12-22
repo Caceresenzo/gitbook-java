@@ -31,6 +31,9 @@ public class FeignGitBookErrorDecoder extends ErrorDecoder.Default {
 
 			this.mappers.add(ErrorMapper.equals("No matching organization found", GitBookClientException.OrganizationNotFound::new));
 
+			/* TODO: Add check on URL as well */
+			this.mappers.add(ErrorMapper.startsWith("Invalid ID: ", GitBookClientException.SiteNotFound::new));
+
 			this.mappers.add(ErrorMapper.startsWith("Space not found", GitBookClientException.SpaceNotFound::new));
 			this.mappers.add(ErrorMapper.startsWith("No matching space found", GitBookClientException.SpaceNotFound::new));
 			this.mappers.add(ErrorMapper.startsWithAndEndswith("space ", " not found", GitBookClientException.SpaceNotFound::new));

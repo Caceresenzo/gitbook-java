@@ -17,6 +17,7 @@ import dev.caceresenzo.gitbook.model.File;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.Page;
 import dev.caceresenzo.gitbook.model.RevisionPage;
+import dev.caceresenzo.gitbook.model.Site;
 import dev.caceresenzo.gitbook.model.Space;
 import dev.caceresenzo.gitbook.model.User;
 import dev.caceresenzo.gitbook.util.GitBookUtils;
@@ -104,6 +105,32 @@ public class GitBookClientImpl implements GitBookClient {
 		try {
 			return Optional.of(delegate.getOrganizationById(organizationId));
 		} catch (GitBookClientException.OrganizationNotFound __) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Stream<Site> findAllSites(String organizationId) {
+		if (isBlank(organizationId)) {
+			return Stream.empty();
+		}
+
+		try {
+			return asStream((pageSize, nextCursor) -> delegate.getSites(organizationId, pageSize, nextCursor));
+		} catch (GitBookClientException.OrganizationNotFound __) {
+			return Stream.empty();
+		}
+	}
+
+	@Override
+	public Optional<Site> findSiteById(String organizationId, String siteId) {
+		if (isBlank(organizationId) || isBlank(siteId)) {
+			return Optional.empty();
+		}
+
+		try {
+			return Optional.of(delegate.getSiteById(organizationId, siteId));
+		} catch (GitBookClientException.OrganizationNotFound | GitBookClientException.SiteNotFound __) {
 			return Optional.empty();
 		}
 	}

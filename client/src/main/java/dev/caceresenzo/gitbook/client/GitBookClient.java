@@ -11,6 +11,8 @@ import dev.caceresenzo.gitbook.model.File;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.Page;
 import dev.caceresenzo.gitbook.model.RevisionPage;
+import dev.caceresenzo.gitbook.model.Site;
+import dev.caceresenzo.gitbook.model.SiteStructure;
 import dev.caceresenzo.gitbook.model.Space;
 import dev.caceresenzo.gitbook.model.User;
 import lombok.Data;
@@ -54,6 +56,10 @@ public interface GitBookClient {
 	 * @return An {@link Organization organization}, if it exists.
 	 */
 	Optional<Organization> findOrganizationById(String organizationId);
+
+	Stream<Site> findAllSites(String organizationId);
+
+	Optional<Site> findSiteById(String organizationId, String siteId);
 
 	/**
 	 * List all spaces.

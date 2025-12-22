@@ -28,16 +28,19 @@ class GitBookClientImplTest extends BaseGitBookTest {
 	static GitBookClient unauthenticatedClient;
 
 	public static final String ORGANIZATION_ID_ENV_VAR = "GITBOOK_COMPONENTS_ORGANIZATION_ID";
+	public static final String SITE_ID_ENV_VAR = "GITBOOK_COMPONENTS_SITE_ID";
 	public static final String SPACE_ID_ENV_VAR = "GITBOOK_COMPONENTS_SPACE_ID";
 	public static final String CHANGE_REQUEST_ID_ENV_VAR = "GITBOOK_COMPONENTS_CHANGE_REQUEST_ID";
 
 	static String organizationId;
+	static String siteId;
 	static String spaceId;
 	static String changeRequestId;
 
 	@BeforeAll
 	static void setUp() {
 		organizationId = assertEnvironmentVariable(ORGANIZATION_ID_ENV_VAR);
+		siteId = assertEnvironmentVariable(SITE_ID_ENV_VAR);
 		spaceId = assertEnvironmentVariable(SPACE_ID_ENV_VAR);
 		changeRequestId = assertEnvironmentVariable(CHANGE_REQUEST_ID_ENV_VAR);
 
@@ -110,6 +113,37 @@ class GitBookClientImplTest extends BaseGitBookTest {
 		final var organization = unauthenticatedClient.findOrganizationById("x");
 
 		assertThat(organization).isEmpty();
+	}
+
+	@Test
+	void findAllSites() {
+		final var sites = client.findAllSites(organizationId)
+			.limit(1)
+			.toList();
+
+		assertThat(sites).hasSizeGreaterThanOrEqualTo(1);
+	}
+
+	@Test
+	void findSiteById() {
+		final var site = client.findSiteById(organizationId, siteId);
+
+		assertThat(site).isNotEmpty();
+	}
+
+	@Test
+	void findSiteByIdWhenUnauthenticated() {
+		assertThrows(GitBookClientException.AuthenticationRequired.class, () -> {
+			unauthenticatedClient.findSiteById(organizationId, siteId);
+		});
+
+	}
+
+	@Test
+	void findSiteByIdWhenNotFound() {
+		final var site = client.findSiteById(organizationId, "x");
+
+		assertThat(site).isEmpty();
 	}
 
 	@Test
