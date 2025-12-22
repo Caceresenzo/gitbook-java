@@ -145,15 +145,24 @@ public sealed interface Block extends Node {
 
 	}
 
-	final class Heading1 extends SimpleHeading implements Block {}
+	@Getter
+	@Setter
+	class Heading extends SimpleBlock {
 
-	final class Heading2 extends SimpleHeading implements Block {}
+		@JsonProperty("meta.id")
+		private String id;
 
-	final class Heading3 extends SimpleHeading implements Block {}
+	}
+
+	final class Heading1 extends Heading implements Block {}
+
+	final class Heading2 extends Heading implements Block {}
+
+	final class Heading3 extends Heading implements Block {}
 
 	@Data
 	@EqualsAndHashCode(callSuper = true)
-	final class Hint extends SimpleHeading implements Block {
+	final class Hint extends SimpleBlock implements Block {
 
 		@JsonProperty("data.style")
 		private Style style;
@@ -351,14 +360,5 @@ class SimpleBlock {
 	public String toString() {
 		return "%s(key=\"%s\", children=%s)".formatted(getClass().getSimpleName(), key, children);
 	}
-
-}
-
-@Getter
-@Setter
-class SimpleHeading extends SimpleBlock {
-
-	@JsonProperty("meta.id")
-	private String id;
 
 }
