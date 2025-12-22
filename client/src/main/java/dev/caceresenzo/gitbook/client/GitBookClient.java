@@ -13,6 +13,7 @@ import dev.caceresenzo.gitbook.model.Page;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Site;
 import dev.caceresenzo.gitbook.model.SiteStructure;
+import dev.caceresenzo.gitbook.model.SiteStructure.SiteSpaces.Structure.SiteSpace;
 import dev.caceresenzo.gitbook.model.Space;
 import dev.caceresenzo.gitbook.model.User;
 import lombok.Data;
@@ -61,11 +62,13 @@ public interface GitBookClient {
 
 	Optional<Site> findSiteById(String organizationId, String siteId);
 
+	Optional<SiteStructure> getSiteStructure(String organizationId, String siteId);
+
 	/**
 	 * List all spaces.
 	 *
 	 * @param organizationId The unique ID of the organization.
-	 * @return A {@link Stream stream} of {@link Space spaces} for the specified {@link Organization organization}.
+	 * @return A {@link Stream stream} of {@link SiteSpace spaces} for the specified {@link Organization organization}.
 	 */
 	Stream<Space> findAllSpaces(String organizationId);
 
@@ -73,7 +76,7 @@ public interface GitBookClient {
 	 * Get a space by its ID.
 	 *
 	 * @param spaceId The unique ID of the space.
-	 * @return A {@link Space space}, if it exists.
+	 * @return A {@link SiteSpace space}, if it exists.
 	 */
 	Optional<Space> findSpaceById(String spaceId);
 
@@ -92,7 +95,7 @@ public interface GitBookClient {
 	 * List all space pages.
 	 *
 	 * @param spaceId The unique ID of the space.
-	 * @return A {@link List list} of {@link Page pages} in the {@link Space space}.
+	 * @return A {@link List list} of {@link Page pages} in the {@link SiteSpace space}.
 	 * @implSpec If the space does not exist, {@link Optional#empty()} is returned.
 	 */
 	Optional<List<Page>> getSpacePages(String spaceId);
@@ -101,7 +104,7 @@ public interface GitBookClient {
 	 * List all space files.
 	 *
 	 * @param spaceId The unique ID of the space.
-	 * @return A {@link Stream stream} of {@link File files} in the {@link Space space}.
+	 * @return A {@link Stream stream} of {@link File files} in the {@link SiteSpace space}.
 	 * @implSpec If the space does not exist, {@link Stream#empty()} is returned.
 	 */
 	Stream<File> findAllSpaceFiles(String spaceId);
@@ -110,7 +113,7 @@ public interface GitBookClient {
 	 * List all change requests for each statuses in the enum order.
 	 *
 	 * @param spaceId The unique ID of the space.
-	 * @return A {@link Stream stream} of {@link ChangeRequest change requests} in the {@link Space space}.
+	 * @return A {@link Stream stream} of {@link ChangeRequest change requests} in the {@link SiteSpace space}.
 	 * @see ChangeRequest.Status
 	 * @see GitBookClient#findAllChangeRequests(String, ChangeRequest.Status)
 	 * @implSpec If the space does not exist, {@link Stream#empty()} is returned.
@@ -122,7 +125,7 @@ public interface GitBookClient {
 	 *
 	 * @param spaceId The unique ID of the space.
 	 * @param status Only change requests matching this {@link ChangeRequest.Status status} will be returned.
-	 * @return A {@link Stream stream} of {@link ChangeRequest change requests} in the {@link Space space}.
+	 * @return A {@link Stream stream} of {@link ChangeRequest change requests} in the {@link SiteSpace space}.
 	 * @see GitBookClient#findAllChangeRequests(String)
 	 * @implSpec If the space does not exist, {@link Stream#empty()} is returned.
 	 */
@@ -148,7 +151,7 @@ public interface GitBookClient {
 	 * @see GitBookClient#findChangeRequestById(String, String)
 	 * @implSpec If the space does not exist, {@link Optional#empty()} is returned.
 	 */
-	Optional<ChangeRequest> findChangeRequestByNumber(String spaceId, int changeRequestNumber);
+	Optional<ChangeRequest> findChangeRequestByNumber(String spaceId, long changeRequestNumber);
 
 	/**
 	 * Get a change request page by its path.

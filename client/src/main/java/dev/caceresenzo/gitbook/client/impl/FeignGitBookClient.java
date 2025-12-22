@@ -10,6 +10,7 @@ import dev.caceresenzo.gitbook.model.File;
 import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Site;
+import dev.caceresenzo.gitbook.model.SiteStructure;
 import dev.caceresenzo.gitbook.model.Space;
 import dev.caceresenzo.gitbook.model.User;
 import feign.Param;
@@ -39,6 +40,9 @@ public interface FeignGitBookClient {
 
 	@RequestLine("GET /v1/orgs/{organizationId}/sites/{siteId}")
 	Site getSiteById(@Param String organizationId, @Param String siteId);
+
+	@RequestLine("GET /v1/orgs/{organizationId}/sites/{siteId}/structure")
+	SiteStructure getSiteStructure(@Param String organizationId, @Param String siteId);
 
 	@RequestLine("GET /v1/orgs/{organizationId}/spaces?limit={limit}&page={page}")
 	Paginated<Space> getSpaces(@Param String organizationId, @Param int limit, @Param String page);

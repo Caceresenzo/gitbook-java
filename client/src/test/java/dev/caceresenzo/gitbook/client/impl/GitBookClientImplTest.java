@@ -2,6 +2,7 @@ package dev.caceresenzo.gitbook.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +23,7 @@ import dev.caceresenzo.gitbook.BaseGitBookTest;
 import dev.caceresenzo.gitbook.client.GitBookClient;
 import dev.caceresenzo.gitbook.client.GitBookClientException;
 import dev.caceresenzo.gitbook.model.ChangeRequest;
+import dev.caceresenzo.gitbook.model.SiteStructure;
 
 class GitBookClientImplTest extends BaseGitBookTest {
 
@@ -144,6 +146,20 @@ class GitBookClientImplTest extends BaseGitBookTest {
 		final var site = client.findSiteById(organizationId, "x");
 
 		assertThat(site).isEmpty();
+	}
+
+	@Test
+	void getSiteStructure() {
+		final var siteStructure = client.getSiteStructure(organizationId, siteId);
+		assertThat(siteStructure).isNotEmpty();
+
+		final var siteSpaces = assertInstanceOf(SiteStructure.SiteSpaces.class, siteStructure.get());
+
+		final var structure = siteSpaces.getStructure();
+		assertThat(structure).hasSize(1);
+
+		final var siteSpace = assertInstanceOf(SiteStructure.SiteSpaces.Structure.SiteSpace.class, structure.get(0));
+		assertThat(siteSpace.getSpace().getId()).isEqualTo(spaceId);
 	}
 
 	@Test

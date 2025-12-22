@@ -18,6 +18,7 @@ import dev.caceresenzo.gitbook.model.Organization;
 import dev.caceresenzo.gitbook.model.Page;
 import dev.caceresenzo.gitbook.model.RevisionPage;
 import dev.caceresenzo.gitbook.model.Site;
+import dev.caceresenzo.gitbook.model.SiteStructure;
 import dev.caceresenzo.gitbook.model.Space;
 import dev.caceresenzo.gitbook.model.User;
 import dev.caceresenzo.gitbook.util.GitBookUtils;
@@ -136,6 +137,19 @@ public class GitBookClientImpl implements GitBookClient {
 	}
 
 	@Override
+	public Optional<SiteStructure> getSiteStructure(String organizationId, String siteId) {
+		if (isBlank(organizationId) || isBlank(siteId)) {
+			return Optional.empty();
+		}
+
+		try {
+			return Optional.of(delegate.getSiteStructure(organizationId, siteId));
+		} catch (GitBookClientException.OrganizationNotFound | GitBookClientException.SiteNotFound __) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
 	public Stream<Space> findAllSpaces(String organizationId) {
 		if (isBlank(organizationId)) {
 			return Stream.empty();
@@ -234,7 +248,7 @@ public class GitBookClientImpl implements GitBookClient {
 	}
 
 	@Override
-	public Optional<ChangeRequest> findChangeRequestByNumber(String spaceId, int changeRequestNumber) {
+	public Optional<ChangeRequest> findChangeRequestByNumber(String spaceId, long changeRequestNumber) {
 		return findChangeRequestById(spaceId, String.valueOf(changeRequestNumber));
 	}
 
