@@ -58,10 +58,33 @@ public interface GitBookClient {
 	 */
 	Optional<Organization> findOrganizationById(String organizationId);
 
+	/**
+	 * List all sites.
+	 *
+	 * @param organizationId The unique ID of the organization.
+	 * @return A {@link Stream stream} of {@link Site sites} for the specified {@link Organization organization}.
+	 * @implSpec If the organization does not exist, {@link Stream#empty()} is returned.
+	 */
 	Stream<Site> findAllSites(String organizationId);
 
+	/**
+	 * Get a site by its ID.
+	 *
+	 * @param organizationId The unique ID of the organization.
+	 * @param siteId The unique ID of the site.
+	 * @return A {@link Site site}, if it exists.
+	 * @implSpec If the organization does not exist, {@link Optional#empty()} is returned.
+	 */
 	Optional<Site> findSiteById(String organizationId, String siteId);
 
+	/**
+	 * Get a site structure.
+	 *
+	 * @param organizationId The unique ID of the organization.
+	 * @param siteId The unique ID of the site.
+	 * @return A {@link SiteStructure site structure}, if the site exists.
+	 * @implSpec If the organization or site does not exist, {@link Optional#empty()} is returned.
+	 */
 	Optional<SiteStructure> getSiteStructure(String organizationId, String siteId);
 
 	/**
@@ -76,7 +99,7 @@ public interface GitBookClient {
 	 * Get a space by its ID.
 	 *
 	 * @param spaceId The unique ID of the space.
-	 * @return A {@link SiteSpace space}, if it exists.
+	 * @return A {@link Space space}, if it exists.
 	 */
 	Optional<Space> findSpaceById(String spaceId);
 

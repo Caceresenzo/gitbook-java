@@ -15,6 +15,10 @@ This Java client connects with GitBook.com, enabling simple interaction with the
 		- [Organization](#organization)
 			- [Stream Organizations](#stream-organizations)
 			- [Find an Organization by ID](#find-an-organization-by-id)
+		- [Site](#site)
+			- [Stream Sites](#stream-sites)
+			- [Find a Site by ID](#find-a-site-by-id)
+			- [Get a Site Structure](#get-a-site-structure)
 		- [Space](#space)
 			- [Stream Spaces](#stream-spaces)
 			- [Find a Space by ID](#find-a-space-by-id)
@@ -106,6 +110,34 @@ List<Organization> organizations = client.findAllOrganizations().toList();
 ```java
 String organizationId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
 Optional<Organization> organization = client.findOrganization(organizationId);
+```
+
+### Site
+
+#### Stream Sites
+
+```java
+String organizationId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Stream<Site> sites = client.findAllSites(organizationId);
+
+/* or get a list via */
+List<Site> sites = client.findAllSites(organizationId).toList();
+```
+
+#### Find a Site by ID
+
+```java
+String organizationId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String siteId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<Site> site = client.findSiteById(organizationId, siteId);
+```
+
+#### Get a Site Structure
+
+```java
+String organizationId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+String siteId = "a0b1c2d3e4f5g6h7i8j9k0l1m2n3";
+Optional<SiteStructure> siteStructure = client.getSiteStructure(organizationId, siteId);
 ```
 
 ### Space
